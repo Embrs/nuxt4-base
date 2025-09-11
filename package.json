@@ -21,11 +21,9 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@vue/language-plugin-pug": "^3.0.6",
     "pug": "^3.0.3",
-    "pug-plain-loader": "^1.1.0",
-    "sass": "^1.92.1",
-    "typescript": "^5.9.2",
-    "vue-eslint-parser-template-tokenizer-pug": "^1.0.0"
+    "sass": "^1.92.1"
   },
   "engines": {
     "node": ">= 24.7.0"

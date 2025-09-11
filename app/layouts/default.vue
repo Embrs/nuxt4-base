@@ -7,7 +7,7 @@
   .def-layout-header-area
     p Header
   .def-layout-body-area
-    slot
+    slot/
   .def-layout-footer-area
     p Footer
 </template>

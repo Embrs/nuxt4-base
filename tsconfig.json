@@ -1,21 +1,33 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
   "files": [],
-  // "vueCompilerOptions": {
-  //   "plugins": ["@vue/language-plugin-pug"]
-  // },
+  "vueCompilerOptions": {
+    "plugins": ["@vue/language-plugin-pug"]
+  },
+  "extends": "./.nuxt/tsconfig.json",
   "references": [
-    {
-      "path": "./.nuxt/tsconfig.app.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.server.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.shared.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.node.json"
-    }
+    // {
+    //   "path": "./.nuxt/tsconfig.app.json"
+    // },
+    // {
+    //   "path": "./.nuxt/tsconfig.server.json"
+    // },
+    // {
+    //   "path": "./.nuxt/tsconfig.shared.json"
+    // },
+    // {
+    //   "path": "./.nuxt/tsconfig.node.json"
+    // }
   ]
 }
+
+// {
+//   // https://nuxt.com/docs/guide/concepts/typescript
+//   "files": [],
+//   "vueCompilerOptions": {
+//     "plugins": ["@vue/language-plugin-pug"]
+//   },
+//   // 讓 IDE 直接承接 Nuxt 產生的型別設定（包含全域元件如 NuxtLayout / NuxtPage）
+//   "extends": "./.nuxt/tsconfig.json",
+//   "references": []
+// }

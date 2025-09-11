@@ -44,6 +44,4 @@
     }
   },
   "scss.lint.unknownAtRules": "ignore",
-  // ESLint: 啟用 Flat Config 與 .vue 驗證
-  "eslint.useFlatConfig": true
 }

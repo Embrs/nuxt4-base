@@ -1,20 +1,7 @@
 // @ts-check
-// import vueParser from 'vue-eslint-parser';
 import withNuxt from './.nuxt/eslint.config.mjs';
 export default withNuxt([
   {
-    // files: ['**/*.{ts,mts,tsx,vue}'],
-    // languageOptions: {
-    //   parser: vueParser,
-    //   ecmaVersion: 'latest',
-    //   sourceType: 'module',
-    //   parserOptions: {
-    //     templateTokenizer: {
-    //       // template tokenizer for `<template lang="pug">`
-    //       'pug': 'vue-eslint-parser-template-tokenizer-pug',
-    //     }
-    //   },
-    // },
     rules: {
       'dot-notation': 'off', // 不強制使用 "."
       'no-console': 'off', // 可以使用 console
@@ -27,7 +14,18 @@ export default withNuxt([
       'no-alert': 'off', // alert、confirm 和 prompt 禁止使用
       'arrow-parens': ['error', 'always'], // ()=>箭頭
       curly: 'off', // 可用 return 簡寫
+      // 不強制自閉合風格（無論是 HTML 或 Vue 自訂元件），避免團隊風格差異帶來噪音
+      'vue/html-self-closing': ['error', {
+        html: {
+          void: 'any',
+          normal: 'any',
+          component: 'any'
+        },
+        svg: 'any',
+        math: 'any'
+      }],
     }
   }
 ]);
+
 

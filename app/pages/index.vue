@@ -5,6 +5,7 @@
 <template lang="pug">
 .PageIndex
   p PageIndex
+  DemoItem1
 </template>
 
 <style lang="scss" scoped>
