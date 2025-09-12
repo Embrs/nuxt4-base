@@ -20,14 +20,3 @@
     // }
   ]
 }
-
-// {
-//   // https://nuxt.com/docs/guide/concepts/typescript
-//   "files": [],
-//   "vueCompilerOptions": {
-//     "plugins": ["@vue/language-plugin-pug"]
-//   },
-//   // 讓 IDE 直接承接 Nuxt 產生的型別設定（包含全域元件如 NuxtLayout / NuxtPage）
-//   "extends": "./.nuxt/tsconfig.json",
-//   "references": []
-// }

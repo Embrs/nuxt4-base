@@ -1,5 +1,7 @@
+/** Enum 庫 */
 /** API 狀態 */
 const apiStatus = {
+  none: '',
   /** 成功 */
   success: 200,
   /** 失敗 */

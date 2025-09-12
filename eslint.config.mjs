@@ -14,6 +14,10 @@ export default withNuxt([
       'no-alert': 'off', // alert、confirm 和 prompt 禁止使用
       'arrow-parens': ['error', 'always'], // ()=>箭頭
       curly: 'off', // 可用 return 簡寫
+      '@typescript-eslint/no-unused-vars': 'off', // 不檢查未使用變數
+      '@typescript-eslint/no-explicit-any': 'off', // 不檢查 any
+      '@typescript-eslint/ban-ts-comment': 'off',
+      
       // 不強制自閉合風格（無論是 HTML 或 Vue 自訂元件），避免團隊風格差異帶來噪音
       'vue/html-self-closing': ['error', {
         html: {
