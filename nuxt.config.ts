@@ -56,7 +56,7 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: 'my-icon',
-        dir: 'assets/icons'
+        dir: 'app/assets/icons'
       }
     ],
     // https://github.com/nuxt/icon?tab=readme-ov-file#client-bundle

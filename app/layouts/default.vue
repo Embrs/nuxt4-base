@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // LayoutDefault 請填寫功能描述👈
+const storeEnv = StoreEnv();
 </script>
 
 <template lang="pug">
@@ -7,7 +8,7 @@
   .def-layout-header-area
     p Header
   .def-layout-body-area
-    slot/
+    slot
   .def-layout-footer-area
     p Footer
 </template>

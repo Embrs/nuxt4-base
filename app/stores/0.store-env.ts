@@ -10,5 +10,7 @@ export const StoreEnv = defineStore('StoreEnv', () => {
       env.value = runtimeConfig;
     }
   };
-  return { Init, env };
+
+  Init();
+  return { env };
 });

@@ -1,12 +1,10 @@
 <script setup lang="ts">
 // DemoItem1 請填寫功能描述👈
-const storeDemo = StoreDemo();
 </script>
 
 <template lang="pug">
 .DemoItem1
   p DemoItem1
-  p {{ storeDemo.aa }}
 </template>
 
 <style lang="scss" scoped>
