@@ -18,13 +18,17 @@ export const StoreSelf = defineStore('StoreSelf', () => {
     SetToken('');
   };
 
+  /** 登出 */
+  const SignOut = () => {
+    ClearInfo();
+  };
   // -----------------------------------------------------------------------------------------------
   return {
     /** 是否登入 */
     isSignIn,
     /** 設定 Token */
     SetToken,
-    /** 個人資料清除 */
-    ClearInfo,
+    /** 登出 */
+    SignOut,
   };
 });

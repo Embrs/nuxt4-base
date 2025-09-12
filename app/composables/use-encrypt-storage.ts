@@ -1,3 +1,4 @@
+import _$ from 'lodash';
 // 有加密功能的 local storage，會出現水合警告，可存大容量
 export const useEncryptStorage = <T>(key: string, defaultValue: T) => {
   const _data = ref<T>(defaultValue);
@@ -31,7 +32,12 @@ export const useEncryptStorage = <T>(key: string, defaultValue: T) => {
     }
   };
 
-  /** Init ，寫在 Mounted 會爆出水合警告*/
+  /** Init ，寫在 Mounted前 會爆出水合警告*/
   if (import.meta.client) Load();
+
+  /** 使用 onMounted 初始，middleware 會讀不到值 */
+  // onMounted(() => {
+  //   Load();
+  // });
   return data;
 };
