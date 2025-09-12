@@ -38,7 +38,8 @@ export default defineNuxtConfig({
     '@pinia/nuxt', // Pinia
     '@nuxt/eslint', 
     '@nuxt/fonts',
-    '@nuxt/icon'
+    '@nuxt/icon',
+    '@nuxtjs/color-mode',
   ],
 
   // nuxt font ----------------------------------

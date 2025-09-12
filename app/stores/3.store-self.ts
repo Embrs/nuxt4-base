@@ -22,6 +22,7 @@ export const StoreSelf = defineStore('StoreSelf', () => {
   const SignOut = () => {
     ClearInfo();
   };
+  
   // -----------------------------------------------------------------------------------------------
   return {
     /** 是否登入 */

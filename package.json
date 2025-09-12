@@ -20,6 +20,7 @@
     "@nuxt/eslint": "^1.9.0",
     "@nuxt/fonts": "^0.11.4",
     "@nuxt/icon": "^2.0.0",
+    "@nuxtjs/color-mode": "^3.5.2",
     "@pinia/nuxt": "^0.11.2",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash-es": "^4.17.12",
@@ -27,8 +28,8 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.18",
     "eslint": "^9.35.0",
-    "pinia": "^3.0.3",
     "lodash-es": "^4.17.21",
+    "pinia": "^3.0.3",
     "pug": "^3.0.3",
     "sass": "^1.92.1"
   },
