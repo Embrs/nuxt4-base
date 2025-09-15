@@ -2,7 +2,40 @@
 // 參考常見 UA 標記：Facebook/Instagram/LINE/WeChat/QQ/TikTok/Twitter/Telegram 等
 // 並加入 Android WebView 與 iOS UIWebView/WKWebView 常見特徵
 import { ref, computed, onMounted } from 'vue';
+import { createApp, type App as VueApp } from 'vue';
 
+// 單例掛載節點與 App 實例，避免重複掛載
+let elDiv: HTMLElement | null = null;
+let elApp: VueApp<Element> | null = null;
+
+/** 挂载 In-App Browser 遮罩 */
+const MountInAppOverlay = async () => {
+  if (typeof window === 'undefined') return; // SSR 安全
+  if (elApp) return; // 已掛載
+
+  elDiv = document.createElement('div');
+  elDiv.id = 'inapp-browser-overlay';
+  document.body.appendChild(elDiv);
+
+  // 動態載入組件以避免 SSR 時載入 SFC
+  const mod = await import('@/components/tool/inapp-browser-block.vue');
+  const Comp = mod.default;
+  elApp = createApp(Comp);
+  elApp.mount(elDiv);
+};
+
+/** 卸载 In-App Browser 遮罩 */
+const UnmountInAppOverlay = () => {
+  if (!elApp) return;
+  elApp.unmount();
+  elApp = null;
+  if (elDiv?.parentNode) {
+    elDiv.parentNode.removeChild(elDiv);
+  }
+  elDiv = null;
+};
+// -----------------------------------------------------------------------------------------------
+/** 偵測是否為各大 App 內建瀏覽器 */
 export const UseInAppBrowser = () => {
   /** 是否為 App 內建瀏覽器 */
   const isInApp = ref(false);
@@ -40,9 +73,18 @@ export const UseInAppBrowser = () => {
       const matchIOSWV = isIOS.value && isiOSWebViewRegex.test(lowerUA);
 
       // 綜合條件：明確的 App UA 或推測為 WebView
-      isInApp.value = Boolean(matchInApp || matchAndroidWV || matchIOSWV);
+      const detected = Boolean(matchInApp || matchAndroidWV || matchIOSWV);
+      isInApp.value = detected;
+
+      // 根據偵測結果動態掛載/卸載遮罩
+      if (detected) {
+        MountInAppOverlay();
+      } else {
+        UnmountInAppOverlay();
+      }
     } catch (err) {
       isInApp.value = false;
+      UnmountInAppOverlay();
     }
   });
 
@@ -122,6 +164,8 @@ export const UseInAppBrowser = () => {
     isAndroid,
     isIOS,
     TryOpenInDefaultBrowser,
-    CopyUrl
+    CopyUrl,
+    MountInAppOverlay,
+    UnmountInAppOverlay
   };
 };

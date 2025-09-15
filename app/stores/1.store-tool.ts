@@ -8,8 +8,6 @@ export const StoreTool = defineStore('StoreTool', () => {
   const windowWidth = ref<number>(pcSize);
   /* 是行動端 */
   const isMobileDevice = ref(true);
-  /* 使用 line 瀏覽器 */
-  const isLineBrowserDevice = ref(false);
   /* > 1024px */
   const isPc = computed(() => windowWidth.value >= pcSize);
   /* < 1024px */
@@ -31,7 +29,6 @@ export const StoreTool = defineStore('StoreTool', () => {
       isMobileDevice.value = !!(userAgent.match(
         /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
       ));
-      isLineBrowserDevice.value = /line/i.test(userAgent);
     }
   };
 
@@ -58,28 +55,12 @@ export const StoreTool = defineStore('StoreTool', () => {
     scrollUpDown.value = 0;
   }, 300);
 
-  // line 瀏覽器檢查
-  const LineBrowserCheck = () => {
-    if (import.meta.server) return;
-    const route = useRoute();
-    setTimeout(() => {
-      if (!(isMobileDevice.value && isLineBrowserDevice.value)) return;
-      const currentPath = route.fullPath;
-      // 判斷目前路徑是否已經包含問號
-      const hasQueryString = currentPath.includes('?');
-      // 建立新的連結
-      const externalLink = `${window.location.origin}${currentPath}${hasQueryString ? '&' : '?'}openExternalBrowser=1`;
-      // 重定向到新的链接
-      window.location.href = externalLink;
-    }, 1);
-  };
 
   onMounted(() => {
     SetDevice();
     SetWindowWidth();
     window.addEventListener('resize', SetWindowWidth);
     window.addEventListener('scroll', SetWindowScroll);
-    LineBrowserCheck();
   });
 
   onBeforeUnmount(() => {
@@ -90,8 +71,6 @@ export const StoreTool = defineStore('StoreTool', () => {
   return {
     /** 是否行動端 */
     isMobileDevice,
-    /** 是否使用 line 瀏覽器 */
-    isLineBrowserDevice,
     /** > 1024px */
     isPc,
     /** < 1024px */
