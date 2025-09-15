@@ -30,7 +30,8 @@ export default defineNuxtConfig({
 
   // Css class 樣式 -----------------------------
   css: [
-    // '@/assets/styles/css/index.css'
+    '@/assets/styles/css/index.css',
+    '@/assets/styles/css/g-style.scss'
   ],
 
   // == Modules ===============================================================================================
@@ -151,6 +152,12 @@ export default defineNuxtConfig({
         scss: { // scss 配置
           silenceDeprecations: ['legacy-js-api'],
           additionalData: `
+            @use '@/assets/styles/scss/config.scss' as *;
+            @use '@/assets/styles/scss/colors.scss' as *;
+            @use '@/assets/styles/scss/fn.scss' as *;
+            @use '@/assets/styles/scss/mixin.scss' as *;
+            @use '@/assets/styles/scss/font-size.scss' as *;
+            @use '@/assets/styles/scss/rwd.scss' as *;
           `,
           quietDeps: true // 關閉警告
         }
