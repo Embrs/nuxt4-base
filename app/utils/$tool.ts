@@ -270,13 +270,6 @@ const HiddenScrollbar = (canHide: boolean) => {
   }
 };
 
-/* 縮放後臺 */
-const ZoomBGM = (zoomNum: number, item:string = '.BgmLayout') => {
-  const el = document.querySelector(item) as HTMLElement;
-  if (!el) return;
-  el.style.zoom = `${zoomNum}`;
-};
-
 /* 首字母大寫 */
 const FirstUpper = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -363,7 +356,6 @@ export default {
   FormDataToJson,
   /** 補零 */
   Zero,
-
   /** async await 等待 */
   Wait,
   /** 滾動到頂部 */
@@ -378,8 +370,6 @@ export default {
   ShareUrl,
   /** 隱藏滾動 */
   HiddenScrollbar,
-  /** 縮放後臺 */
-  ZoomBGM,
   /** 首字母大寫 */
   FirstUpper,
   /** 調整陣列長度 */
@@ -390,5 +380,4 @@ export default {
   CreateRandomImg,
   /** 下載連結檔案 */
   DownloadLinkFile
-
 };

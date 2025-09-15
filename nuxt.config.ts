@@ -7,8 +7,8 @@ export default defineNuxtConfig({
 
   // == Setting ===============================================================================================
   devServer: {
-    // port: Number(process.env.NUXT_PORT || 3001),
-    // host: process.env.NUXT_HOST || '0.0.0.0'
+    port: Number(process.env.NUXT_PORT || 3001),
+    host: process.env.NUXT_HOST || '0.0.0.0'
     // https: { // Nuxt3Https 模式
     //   key: 'app/https/localhost.key',
     //   cert: 'app/https/localhost.crt'

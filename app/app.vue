@@ -19,6 +19,10 @@ StoreTool();
 </script>
 
 <template lang="pug">
-NuxtLayout
-  NuxtPage
+div
+  NuxtLayout
+    NuxtPage
+  ClientOnly
+    //- 瀏覽器攔截
+    ToolInappBrowserBlock
 </template>
