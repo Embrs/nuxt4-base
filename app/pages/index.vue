@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // PageIndex 請填寫功能描述👈
 const storeTheme = StoreTheme();
+const $mitt = UseMitt();
 </script>
 
 <template lang="pug">
@@ -10,6 +11,8 @@ const storeTheme = StoreTheme();
     p 123
   button(@click="() => storeTheme.ChangeTheme('dark')") dark;
   button(@click="() => storeTheme.ChangeTheme('light')") light;
+  button(@click="() => $mitt.EmitRefresh()") EmitRefresh;
+  
   DemoItem1
   //- NuxtLink(to="/demo/pinia") DemoPinia
   button 123
@@ -20,7 +23,9 @@ const storeTheme = StoreTheme();
       p abc
   p {{ $colorMode.preference }}
   .box2
-  p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
+
+  .box3
+    p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
 </template>
 
 <style lang="scss" scoped>
@@ -54,5 +59,11 @@ const storeTheme = StoreTheme();
   }
 }
 
+
 // 組件 ----
+.box3 {
+  @include wh(400px, 400px);
+  background-color: blue;
+  overflow: auto;
+}
 </style>
