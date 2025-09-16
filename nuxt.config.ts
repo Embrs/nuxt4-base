@@ -77,6 +77,8 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxtjs/color-mode',
+    '@vueuse/motion/nuxt' // 入場動畫 https://motion.vueuse.org/features/presets
+
   ],
 
   // nuxt font ----------------------------------
@@ -87,6 +89,10 @@ export default defineNuxtConfig({
     ]
   },
 
+  // colorMode 主題色 ----------------------------
+  colorMode: {
+    classSuffix: ''
+  },
   // nuxt icon ----------------------------------
   icon: {
     componentName: 'NuxtIcon',

@@ -2,6 +2,7 @@
 type ThemeType = 'system' | 'dark' | 'light' | 'pink'
 
 export const StoreTheme = defineStore('StoreTheme', () => {
+  
   const colorMode = useColorMode();
   
   const _lightColorsMap = reactive({
