@@ -1,5 +1,30 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+// https://nuxt.com/docs/api/configuration/nuxt-config
+import { visualizer } from 'rollup-plugin-visualizer'; // 打包分析
+import version from './version'; // 版本號
+import dayjs from 'dayjs'; // 日期處理
 
+
+// ------------------------
+const useVisualizer = false; // 使用打包分析
+// ------------------------
+// vite plugin 建置
+const VitePlugins = () => {
+  const arr = [];
+  if (useVisualizer) {
+    arr.push(
+      visualizer({ // 打包分析 https://juejin.cn/post/7159410085460983839
+        gzipSize: true,
+        brotliSize: true,
+        emitFile: false,
+        filename: 'test.html', // 析圖產生的檔案名
+        open: true // 如果存在本地服務端口，將在打包後自動展示
+      })
+    );
+  }
+  return arr;
+};
+// ===============================================================================
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   // 使用開發工具
@@ -21,6 +46,17 @@ export default defineNuxtConfig({
     public: {}
   },
 
+  // 組件配置 -----------------------------------
+  components: {
+    dirs: [
+      {
+        path: '~/components',
+        global: true,
+        ignore: ['**/*.{md,ts,js,mjs,mts}']
+      }
+    ]
+  },
+
   // 全局範圍設定 composables utils 為預設 --------
   imports: {
     dirs: [
@@ -30,8 +66,8 @@ export default defineNuxtConfig({
 
   // Css class 樣式 -----------------------------
   css: [
-    '@/assets/styles/css/index.css',
-    '@/assets/styles/css/g-style.scss'
+    '@/assets/styles/css-class/index.css',
+    '@/assets/styles/css-class/g-style.scss' // 全局通用
   ],
 
   // == Modules ===============================================================================================
@@ -79,17 +115,6 @@ export default defineNuxtConfig({
   //   // themes: ['dark'] //暗黑模式
   // },
 
-  // 組件配置 -----------------------------------------------------------
-  components: {
-    dirs: [
-      {
-        path: '~/components',
-        global: true,
-        ignore: ['**/*.{md,ts,js,mjs,mts}']
-      }
-    ]
-  },
-
   // == html params =======================================================================================
   app: {
     // baseURL: '/',
@@ -104,7 +129,8 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'zh-Hant-TW',
         // @ts-ignore
-        version: process.env.npm_package_version as string // 版本號
+        version, // 版本號
+        'created-at': dayjs().format('YYYY-MM-DD HH:mm:ss'), // 建立時間
       },
       meta: [
         /** 去除擾人自動偵測 */
@@ -152,17 +178,18 @@ export default defineNuxtConfig({
         scss: { // scss 配置
           silenceDeprecations: ['legacy-js-api'],
           additionalData: `
-            @use '@/assets/styles/scss/config.scss' as *;
-            @use '@/assets/styles/scss/colors.scss' as *;
-            @use '@/assets/styles/scss/fn.scss' as *;
-            @use '@/assets/styles/scss/mixin.scss' as *;
-            @use '@/assets/styles/scss/font-size.scss' as *;
-            @use '@/assets/styles/scss/rwd.scss' as *;
+            @use '@/assets/styles/scss-tool/config.scss' as *;
+            @use '@/assets/styles/scss-tool/colors.scss' as *;
+            @use '@/assets/styles/scss-tool/fn.scss' as *;
+            @use '@/assets/styles/scss-tool/mixin.scss' as *;
+            @use '@/assets/styles/scss-tool/font-size.scss' as *;
+            @use '@/assets/styles/scss-tool/rwd.scss' as *;
           `,
           quietDeps: true // 關閉警告
         }
       }
-    }
+    },
+    plugins: VitePlugins()
   }
 
 });

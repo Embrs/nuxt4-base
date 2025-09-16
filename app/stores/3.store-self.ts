@@ -14,7 +14,7 @@ export const StoreSelf = defineStore('StoreSelf', () => {
 
   /* 個人資料清除 */
   const ClearInfo = () => {
-    // 清除 token`
+    // 清除 token
     SetToken('');
   };
 

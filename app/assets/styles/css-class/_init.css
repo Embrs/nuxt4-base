@@ -26,19 +26,6 @@ html, body, p, pre, menu {
   margin: 0;
   padding: 0;
 }
-img {
-  /* 不可拖曳圖片 */
-  -webkit-user-drag: none;
-
-  /* ios禁用菜單 */
-  -webkit-touch-callout: none;
-
-  /* 防止拖拉圖片 */
-  pointer-events: none;
-  
-  /* 去空白 */
-  display: block;
-}
 
 a {
   text-decoration: inherit;

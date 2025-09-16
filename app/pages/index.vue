@@ -4,17 +4,17 @@
 
 <template lang="pug">
 .PageIndex
-  .g-row
+  div(class="g-row")
     p PageIndex
     p 123
   DemoItem1
-  NuxtLink(to="/demo/pinia") DemoPinia
+  //- NuxtLink(to="/demo/pinia") DemoPinia
   button 123
   .box
     .test1
-      p 123
+      p 123456789
     .text2
-      p 456
+      p abc
 </template>
 
 <style lang="scss" scoped>
@@ -25,16 +25,20 @@
   .box {
     width: 200px;
     height: 200px;
-     @include grid-place("center");
+     @include grid-place("test", center, center);
     .test1 {
-      grid-area: center;
+      grid-area: test;
       z-index: 0;
-      background-color: red;
+ 
+        background-color: red;
+    
     }
     .text2 {
-      grid-area: center;
+      grid-area: test;
       z-index: 1;
-      background-color:  green
+
+        background-color:  green;
+
     }
     
   }

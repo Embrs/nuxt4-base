@@ -4,6 +4,14 @@
   height: $height;
 }
 
+// 圖片鎖定 不可下載與點擊
+@mixin img-lock {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
+  display: block;
+}
+
 // 橫向排列
 @mixin row($gap: 0, $align: center) {
   display: inline-flex;
@@ -52,10 +60,15 @@
 }
 
 // Grid 重疊，要搭配 grid-area: center;
-@mixin grid-place($area: "center", $place-row: center, $place-col: stretch) {
+@mixin grid-place($area: "area-1", $place-row: center, $place-col: stretch) {
   display: grid;
   grid-template-areas: $area;
   place-items: $place-row $place-col; // start | center | end | stretch
+}
+
+// Grid 重疊置中
+@mixin grid-center($area: "area-1") {
+  @include grid-place($area, center, center);
 }
 
 // 文字單行
