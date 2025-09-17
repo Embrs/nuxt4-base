@@ -23,6 +23,9 @@ StoreTool();
 </script>
 
 <template lang="pug">
-NuxtLayout
-  NuxtPage
+div
+  NuxtLayout
+    NuxtPage
+  //- Drawer Modal Dialog 跳窗群組
+  OpenGroup
 </template>

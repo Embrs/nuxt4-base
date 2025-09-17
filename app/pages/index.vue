@@ -2,7 +2,12 @@
 // PageIndex 請填寫功能描述👈
 const storeTheme = StoreTheme();
 const $mitt = UseMitt();
-</script>
+
+const OpenDialogDemo = async() => {
+  const res = await $open.DialogDemo({ demo: 'test123' });
+  console.log(res);
+};
+</script>2
 
 <template lang="pug">
 .PageIndex
@@ -26,6 +31,8 @@ const $mitt = UseMitt();
 
   .box3
     p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
+
+  button(@click="OpenDialogDemo") Open DialogDemo
 </template>
 
 <style lang="scss" scoped>

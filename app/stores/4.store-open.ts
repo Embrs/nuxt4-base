@@ -1,15 +1,11 @@
+/** 儲存打開的組件（不用調整） */
 export const StoreOpen = defineStore('StoreOpen', () => {
-  type OpenData = {
-    uuid: string // uuid
-    component: string // 組件
-    params: any // 參數
-    resolve: (value: any) => void // 回傳
-  }
-  const openList = ref<OpenData[]>([]);
+
+  const openList = ref<OpenItem<any>[]>([]);
 
   /** 開啟 */
-  const OnOpen = (openData: OpenData) => {
-    openList.value.push(openData);
+  const OnOpen = <T>(openItem: OpenItem<T>) => {
+    openList.value.push(openItem);
   };
 
   /** 關閉 */

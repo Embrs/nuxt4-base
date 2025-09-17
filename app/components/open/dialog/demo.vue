@@ -4,38 +4,28 @@
 const $mitt = UseMitt();
 
 // -- 資料 --------------------------------------------------------------------------------------------
-type Props = {
-  params: OpenDialogDemo
-  resolve:(value: OpenNoneRes | PromiseLike<OpenNoneRes>) => void
+type Props  = {
+  params: DialogDemoParams
+  resolve:(value: string | PromiseLike<string>) => void
   level: number
 }
 const props = defineProps<Props>();
 
 // -- 接收事件 -----------------------------------------------------------------------------------------
 const ClickOpenDemo = $lodash.debounce(async () => {
-  const openParams: OpenDialogDemo = {
+  const openParams: DialogDemoParams = {
     demo: 'test123'
   };
-  await $open.OpenDialogDemo(openParams);
+  await $open.DialogDemo(openParams);
   // console.log('dialog');
 }, 400, { leading: true, trailing: false });
-
-// -- 生命週期 -----------------------------------------------------------------------------------------
-const TestOnRefresh = () => {
-  // console.log('demo refresh level', props.level, 123);
-};
-
-onMounted(() => {
-  // console.log('params', props.params);
-  $mitt.OnRefresh(TestOnRefresh);
-});
 
 // -- 發送事件 -----------------------------------------------------------------------------------------
 type Emit = {'on-close': []}
 const emit = defineEmits<Emit>();
 
 const EmitClose = () => {
-  // props.resolve(true);
+  props.resolve(props.params.demo);
   emit('on-close');
 };
 
@@ -47,8 +37,8 @@ const MittRefresh = () => {
 
 <template lang="pug">
 .OpenDialogDemo
-  .mask
-  .card-box
+  .mask-area(v-motion-fade)
+  .content-area(v-motion-roll-bottom)
     p OpenDialogDemo
     NuxtIcon(
       name="material-symbols:close-rounded"
@@ -63,13 +53,15 @@ const MittRefresh = () => {
 <style lang="scss" scoped>
 // 佈局 ----
 .OpenDialogDemo {
-  @include fixed(fill);
+  @include fixed("fill");
   @include center;
-  .mask {
-    @include absolute(fill);
+  .mask-area {
+    @include absolute("fill");
+    grid-area: open-demo;
     background-color: rgb(0 0 0 / 60%);
   }
-  .card-box {
+  .content-area {
+    grid-area: open-demo;
     @include wh(400px, 200px);
     position: relative;
     background-color: #fff;

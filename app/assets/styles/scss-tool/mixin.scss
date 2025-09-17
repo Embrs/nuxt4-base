@@ -51,6 +51,11 @@
   gap: $gap;
 }
 
+/** 預設置中 */
+@mixin center($gap: 0) {
+  @include center-row($gap);
+}
+
 // 稠密 grid
 @mixin auto-grid($gap: 0) {
   display: grid;
@@ -137,30 +142,60 @@
 }
 
 // 定位 -------------------------------------------------------------------------------------------------
+/** absolute */
 @mixin absolute($direction: "tl" ,$a-pos: 0, $b-pos: $a-pos) {
   position: absolute;
   // 上左
-  @if  $direction == "tl" {
+  @if $direction == "tl" {
     top: $a-pos;
     left: $b-pos;
   }
   // 上右
-  @if  $direction == "tr" {
+  @if $direction == "tr" {
     top: $a-pos;
     right: $b-pos;
   }
   // 下左
-  @if  $direction == "bl" {
+  @if $direction == "bl" {
     bottom: $a-pos;
     left: $b-pos;
   }
   // 下右
-  @if  $direction == "br" {
+  @if $direction == "br" {
     right: $b-pos;
     bottom: $a-pos;
   }
   // 填滿
-  @if  $direction == "fill" {
+  @if $direction == "fill" {
+    inset: $a-pos $b-pos $a-pos $b-pos;
+  }
+}
+
+/** fixed */
+@mixin fixed($direction: "tl" ,$a-pos: 0, $b-pos: $a-pos) {
+  position: fixed;
+
+  @if $direction == "tl" {
+    top: $a-pos;
+    left: $b-pos;
+  }
+
+  @if $direction == "tr" {
+    top: $a-pos;
+    right: $b-pos;
+  }
+
+  @if $direction == "bl" {
+    bottom: $a-pos;
+    left: $b-pos;
+  }
+
+  @if $direction == "br" {
+    right: $b-pos;
+    bottom: $a-pos;
+  }
+
+  @if $direction == "fill" {
     inset: $a-pos $b-pos $a-pos $b-pos;
   }
 }
@@ -189,4 +224,3 @@
 @mixin stroke($stroke: 1, $color: white) {
   text-shadow: _stroke($stroke, $color);
 }
-
