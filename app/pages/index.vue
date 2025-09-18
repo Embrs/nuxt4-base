@@ -7,7 +7,8 @@ const OpenDialogDemo = async() => {
   const res = await $open.DialogDemo({ demo: 'test123' });
   console.log(res);
 };
-</script>2
+
+</script>
 
 <template lang="pug">
 .PageIndex
@@ -28,7 +29,7 @@ const OpenDialogDemo = async() => {
       p abc
   p {{ $colorMode.preference }}
   .box2
-
+    img.g-img-lock(:src="$tool.CreateDemoImg()")
   .box3
     p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
 

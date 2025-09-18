@@ -1,5 +1,5 @@
 // 有加密功能的 local storage，會出現水合警告，可存大容量
-export const useEncryptStorage = <T>(key: string, defaultValue: T) => {
+export const UseEncryptStorage = <T>(key: string, defaultValue: T) => {
   const _data = ref<T>(defaultValue);
 
   const data = computed<T>({

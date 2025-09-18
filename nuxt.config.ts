@@ -61,6 +61,7 @@ export default defineNuxtConfig({
   imports: {
     dirs: [
       'stores', // pinia
+      'composables/**', // composables
     ]
   },
 

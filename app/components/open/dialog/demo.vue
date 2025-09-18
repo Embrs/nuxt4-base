@@ -57,11 +57,9 @@ const MittRefresh = () => {
   @include center;
   .mask-area {
     @include absolute("fill");
-    grid-area: open-demo;
     background-color: rgb(0 0 0 / 60%);
   }
   .content-area {
-    grid-area: open-demo;
     @include wh(400px, 200px);
     position: relative;
     background-color: #fff;
@@ -73,7 +71,7 @@ const MittRefresh = () => {
 // 組件 ----
 .close-btn {
   @include btn-click;
-  @include absolute("top-right", 10px, 10px);
+  @include absolute("tr", 10px, 10px);
   @include fs(30px);
 }
 .row-item {

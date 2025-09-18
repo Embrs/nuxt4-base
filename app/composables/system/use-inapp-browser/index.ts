@@ -1,7 +1,7 @@
 // 偵測是否為各大 App 內建瀏覽器（WebView）
 // 參考常見 UA 標記：Facebook/Instagram/LINE/WeChat/QQ/TikTok/Twitter/Telegram 等
 // 並加入 Android WebView 與 iOS UIWebView/WKWebView 常見特徵
-import { ref, computed, onMounted } from 'vue';
+// import { ref, computed, onMounted } from 'vue';
 import { createApp, type App as VueApp } from 'vue';
 
 // 單例掛載節點與 App 實例，避免重複掛載
@@ -18,7 +18,7 @@ const MountInAppOverlay = async () => {
   document.body.appendChild(elDiv);
 
   // 動態載入組件以避免 SSR 時載入 SFC
-  const mod = await import('@/components/tool/inapp-browser-block.vue');
+  const mod = await import('./inapp-browser-block.vue');
   const Comp = mod.default;
   elApp = createApp(Comp);
   elApp.mount(elDiv);

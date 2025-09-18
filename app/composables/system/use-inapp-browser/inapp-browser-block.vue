@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// ToolInappBrowserBlock 內建瀏覽器攔截遮罩
+// SystemInappBrowserBlock 內建瀏覽器攔截遮罩
 const $inAppBrowser = UseInAppBrowser();
 
 const visible = computed(() => $inAppBrowser.isInApp.value);
@@ -33,7 +33,7 @@ const OnCopy = async () => {
 
 <template lang="pug">
 transition(name="fade")
-  .ToolInappBrowserBlock(v-if="visible" class="iab-mask" role="dialog" aria-modal="true")
+  .SystemInappBrowserBlock(v-if="visible" class="iab-mask" role="dialog" aria-modal="true")
     .iab-panel
       .iab-title 偵測到於 App 內建瀏覽器開啟
       p.iab-desc 為確保功能正常，請勿使用 App 內建瀏覽器開啟本頁。
@@ -44,7 +44,7 @@ transition(name="fade")
 </template>
 
 <style scoped lang="scss">
-.ToolInappBrowserBlock {
+.SystemInappBrowserBlock {
   --green: #16a34a;
   --border: #d0d7de;
   --text: #222;

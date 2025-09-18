@@ -7,8 +7,9 @@
 // 圖片鎖定 不可下載與點擊
 @mixin img-lock {
   -webkit-user-drag: none;
-  -webkit-touch-callout: none;
-  pointer-events: none;
+  @supports (-webkit-touch-callout: none) {
+    -webkit-touch-callout: none;
+  }
   display: block;
 }
 
