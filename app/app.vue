@@ -24,8 +24,16 @@ StoreTool();
 
 <template lang="pug">
 div
+  //- 加載橫條
+  NuxtLoadingIndicator(color="#86D4A187")
+
+  //- 加載動畫
+  LoadingPage
+
+  //- 本體
   NuxtLayout
     NuxtPage
+
   //- Drawer Modal Dialog 跳窗群組
   OpenGroup
 </template>

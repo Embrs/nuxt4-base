@@ -43,7 +43,9 @@ export default defineNuxtConfig({
   // env 環境變數 -------------------------------
   runtimeConfig: {
     apiBase: '',
-    public: {}
+    public: {
+      testMode: ''
+    }
   },
 
   // 組件配置 -----------------------------------

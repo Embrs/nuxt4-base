@@ -1,7 +1,7 @@
 // 初始聚焦
-// <input v-focus />
+// <input v-mounted-focus />
 export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.directive('focus', {
+  nuxtApp.vueApp.directive('mounted-focus', {
     mounted (el) {
       el.focus();
     }

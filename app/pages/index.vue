@@ -8,6 +8,11 @@ const OpenDialogDemo = async() => {
   console.log(res);
 };
 
+const ApiDemo = async() => {
+  const res = await $api.SignIn({ account: 'test', password: 'test' });
+  console.log(res);
+};
+
 </script>
 
 <template lang="pug">
@@ -18,6 +23,7 @@ const OpenDialogDemo = async() => {
   button(@click="() => storeTheme.ChangeTheme('dark')") dark;
   button(@click="() => storeTheme.ChangeTheme('light')") light;
   button(@click="() => $mitt.EmitRefresh()") EmitRefresh;
+  button(@click="ApiDemo") ApiDemo;
   
   DemoItem1
   //- NuxtLink(to="/demo/pinia") DemoPinia
@@ -56,7 +62,7 @@ const OpenDialogDemo = async() => {
       grid-area: test;
       z-index: 1;
 
-        background-color:  green;
+      background-color:  green;
 
     }
     
@@ -64,6 +70,7 @@ const OpenDialogDemo = async() => {
   .box2 {
     @include wh(300px, 300px);
     background-color: $demo;
+    overflow: hidden;
   }
 }
 

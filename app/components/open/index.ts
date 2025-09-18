@@ -11,8 +11,23 @@ const Open = <T>(componentName: OpenComponent, params: any): Promise<T> => {
   });
 };
 
+const CloseName = (name: OpenComponent | OpenComponent[]) => {
+  const nameList = Array.isArray(name) ? name : [name];
+  StoreOpen().openList.forEach((item) => {
+    if (nameList.includes(item.componentName)) {
+      StoreOpen().OnClose(item.uuid);
+    }
+  });
+};
+
 // -----------------------------------------------------------------------------------------------
 export default {
+  /** 關閉 */
+  Close: (uuid: string | string[]) => StoreOpen().OnClose(uuid),
+  /** 關閉所有 */
+  CloseAll: () => StoreOpen().OnCloseAll(),
+  /** 關閉指定名稱 組件 */
+  CloseName: (name: OpenComponent | OpenComponent[]) => CloseName(name),
   /** 開啟測試 */
   DialogDemo: (params: DialogDemoParams) => Open('OpenDialogDemo', params)
   // TODO 組件加完後，要設定

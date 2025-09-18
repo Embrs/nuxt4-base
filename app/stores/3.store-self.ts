@@ -25,6 +25,8 @@ export const StoreSelf = defineStore('StoreSelf', () => {
   
   // -----------------------------------------------------------------------------------------------
   return {
+    /** API Token */
+    apiToken,
     /** 是否登入 */
     isSignIn,
     /** 設定 Token */

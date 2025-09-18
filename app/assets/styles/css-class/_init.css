@@ -92,3 +92,13 @@ h6 {
   border-width: 0; /* 2 */
   box-sizing: border-box; /* 1 */
 }
+
+img {
+  -webkit-user-drag: none;
+  display: block;
+}
+@supports (-webkit-touch-callout: none) {
+  img {
+    -webkit-touch-callout: none;
+  }
+}
