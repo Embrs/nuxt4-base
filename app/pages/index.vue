@@ -40,6 +40,7 @@ const ApiDemo = async() => {
     p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
 
   button(@click="OpenDialogDemo") Open DialogDemo
+  ElButton Test
 </template>
 
 <style lang="scss" scoped>

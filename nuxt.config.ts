@@ -80,8 +80,8 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxtjs/color-mode',
-    '@vueuse/motion/nuxt' // 入場動畫 https://motion.vueuse.org/features/presets
-
+    '@vueuse/motion/nuxt', // 入場動畫 https://motion.vueuse.org/features/presets
+    '@element-plus/nuxt'
   ],
 
   // nuxt font ----------------------------------

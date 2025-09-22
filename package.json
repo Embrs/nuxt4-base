@@ -17,6 +17,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@element-plus/nuxt": "^1.1.4",
     "@nuxt/eslint": "^1.9.0",
     "@nuxt/fonts": "^0.11.4",
     "@nuxt/icon": "^2.0.0",
@@ -29,6 +30,7 @@
     "@vueuse/motion": "^3.0.3",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.18",
+    "element-plus": "^2.11.3",
     "eslint": "^9.35.0",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.1",
