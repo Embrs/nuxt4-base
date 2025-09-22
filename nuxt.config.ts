@@ -96,6 +96,7 @@ export default defineNuxtConfig({
   colorMode: {
     classSuffix: ''
   },
+
   // nuxt icon ----------------------------------
   icon: {
     componentName: 'NuxtIcon',
@@ -118,11 +119,11 @@ export default defineNuxtConfig({
   },
 
   // element plus setting ----------------------------------------------
-  // elementPlus: {
-  //   icon: 'ElIcon',
-  //   importStyle: 'scss'
-  //   // themes: ['dark'] //暗黑模式
-  // },
+  elementPlus: {
+    icon: 'ElIcon',
+    importStyle: 'scss'
+    // themes: ['dark'] //暗黑模式
+  },
 
   // == html params =======================================================================================
   app: {
@@ -148,7 +149,6 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', href: '/favicon.ico', sizes: 'any' }
-
       ]
     }
   },
