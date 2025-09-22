@@ -2,6 +2,7 @@
 // PageIndex 請填寫功能描述👈
 const storeTheme = StoreTheme();
 const $mitt = UseMitt();
+const { locales } = useI18n();
 
 const OpenDialogDemo = async() => {
   const res = await $open.DialogDemo({ demo: 'test123' });
@@ -24,6 +25,13 @@ const ApiDemo = async() => {
   button(@click="() => storeTheme.ChangeTheme('light')") light;
   button(@click="() => $mitt.EmitRefresh()") EmitRefresh;
   button(@click="ApiDemo") ApiDemo;
+  .row-item
+    SwitchLocalePathLink(
+      v-for="localeItem in locales" :key="localeItem.code" :locale="localeItem.code"
+    )
+      ElButton {{ localeItem.name }}
+  .row-item
+    p {{ $t('about.title') }}
   
   DemoItem1
   //- NuxtLink(to="/demo/pinia") DemoPinia

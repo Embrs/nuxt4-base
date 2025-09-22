@@ -1,9 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-// https://nuxt.com/docs/api/configuration/nuxt-config
 import { visualizer } from 'rollup-plugin-visualizer'; // 打包分析
 import version from './version'; // 版本號
 import dayjs from 'dayjs'; // 日期處理
-
 
 // ------------------------
 const useVisualizer = false; // 使用打包分析
@@ -74,15 +72,9 @@ export default defineNuxtConfig({
   ],
 
   // == Modules ===============================================================================================
-  modules: [
-    '@pinia/nuxt', // Pinia
-    '@nuxt/eslint', 
-    '@nuxt/fonts',
-    '@nuxt/icon',
-    '@nuxtjs/color-mode',
-    '@vueuse/motion/nuxt', // 入場動畫 https://motion.vueuse.org/features/presets
-    '@element-plus/nuxt'
-  ],
+  modules: [// Pinia
+  '@pinia/nuxt', '@nuxt/eslint', '@nuxt/fonts', '@nuxt/icon', '@nuxtjs/color-mode', // 入場動畫 https://motion.vueuse.org/features/presets
+  '@vueuse/motion/nuxt', '@element-plus/nuxt', '@nuxtjs/i18n'],
 
   // nuxt font ----------------------------------
   // https://nuxt.dev.org.tw/modules/fonts
@@ -123,6 +115,50 @@ export default defineNuxtConfig({
     icon: 'ElIcon',
     importStyle: 'scss'
     // themes: ['dark'] //暗黑模式
+  },
+
+  // 多語系 -------------------------------------------------------------
+  i18n: {
+    // 語系列表
+    locales:[
+      {
+        code: 'zh',
+        iso: 'zh-Hant-TW',
+        file: 'zh.js',
+        name: '繁體中文'
+      },
+      {
+        code: 'en',
+        iso: 'en',
+        file: 'en.js',
+        name: 'English'
+      },
+      {
+        code: 'ja',
+        iso: 'ja',
+        file: 'ja.js',
+        name: '日本語'
+      }
+    ],
+
+    // 預設語系
+    defaultLocale: 'zh',
+
+    // 語系檔案所在資料夾（相對於專案根目錄）
+    langDir: 'locales',
+
+
+    // 路由前綴策略。如果預設語系也加前綴或不加前綴
+    // 可選策略像是 'prefix'、'prefix_except_default'、'no_prefix' 等
+    strategy: 'prefix_except_default',
+
+    // 瀏覽器語言偵測
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      // redirectOn 可設 'root', 'all', etc. v10 行為有所改變，要注意 :contentReference[oaicite:2]{index=2}
+      redirectOn: 'root'
+    },
   },
 
   // == html params =======================================================================================
