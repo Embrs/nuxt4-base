@@ -130,7 +130,6 @@ const EmitClose = () => {
   }
 }
 // 組件 ----
-
 .drawer-content-area {
   @include rwd-pc {
     padding: 20px;
