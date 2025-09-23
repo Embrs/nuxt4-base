@@ -25,11 +25,13 @@ const imgBoxStyle = computed(() => {
   const _style: any = {};
   _style.width = `${props.width}${props.width <= 100 ? '%' : 'px'} !important`;
 
+  // 使用比例縮放
   if (props.useScale) {
     _style['padding-top'] = `${props.height}% !important`;
-  } else {
-    _style.height = `${props.height}${Number(props.height) <= 100 ? '%' : 'px'} !important`;
+    return _style;
   }
+  // 一般模式
+  _style.height = `${props.height}${Number(props.height) <= 100 ? '%' : 'px'} !important`;
   return _style;
 });
 
@@ -49,7 +51,7 @@ const imgBoxStyle = computed(() => {
   )
     template(#error)
       .err-slot
-        NuxtIcon(name="ph:image-duotone" size="45px")
+        NuxtIcon(name="my-icon:img-fail" size="45px")
 </template>
 
 <style lang="scss" scoped>

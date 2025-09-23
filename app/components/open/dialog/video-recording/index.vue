@@ -349,11 +349,12 @@ ElDialogPlus.OpenDialogVideoRecording(
   v-model="$option.visible.value"
   type="info"
   width="400px"
-  hiddenFooter
+  title="錄製影片"
+  :hiddenHeader="true"
+  :hiddenFooter="true"
   @on-close="OnDialogClosed"
 )
   .video-area
-    .title 錄製影片
     //- 操作/預覽區塊
     .video-box
       OpenDialogVideoRecordingPhoneCard
@@ -372,7 +373,7 @@ ElDialogPlus.OpenDialogVideoRecording(
 
     //- 倒數秒數（錄影中顯示）
     .countdown
-      p(v-if="isRecording")  剩餘 {{ countdownSec }} 秒
+      p(v-if="isRecording") 剩餘 {{ countdownSec }} 秒
     //- 倒數進度條（30 秒 -> 100% 到 0%）
     .countdown-bar
       .progress(v-if="isRecording" :style="{ width: (countdownSec / MAX_DURATION * 100) + '%' }")
@@ -403,12 +404,6 @@ ElDialogPlus.OpenDialogVideoRecording(
   gap: 10px;
 }
 
-.title {
-  @include fs(24px, 700);
-  text-align: center;
-  color: #CCA385;
-  transform: translateY(-6px);
-}
 .video-box {
   @include wh;
   max-width: 250px;
@@ -426,9 +421,11 @@ ElDialogPlus.OpenDialogVideoRecording(
   transform: scaleX(-1);
   backface-visibility: hidden;
 }
+
 .is-recording {
   // transform: scaleX(-1);
 }
+
 .actions {
   display: flex;
   gap: 12px;
@@ -443,7 +440,7 @@ ElDialogPlus.OpenDialogVideoRecording(
   cursor: pointer;
   background: #e5e7eb; // gray-200
   color: #111827; // gray-900
-  &.record { background: #CCA385; color: #fff; } // red-500
+  &.record { background: $primary; color: #fff; } // red-500
   &.roteate { 
     @include wh(48px);
     @include center;
@@ -501,7 +498,7 @@ ElDialogPlus.OpenDialogVideoRecording(
 .countdown {
   @include center;
   @include fs(24px, 700);
-  color: #CCA385; // gray-900
+  color: $primary; // gray-900
 }
 
 .countdown-bar {
@@ -514,7 +511,7 @@ ElDialogPlus.OpenDialogVideoRecording(
 
 .countdown-bar .progress {
   height: 100%;
-  background: #CCA385; // amber-500
+  background: $primary; // amber-500
   transition: width 0.2s linear;
 }
 </style>

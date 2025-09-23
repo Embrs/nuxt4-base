@@ -648,7 +648,6 @@ const ExportImage = async () => {
   $option.OnClose();
 };
 
-
 </script>
 
 <template lang="pug">
@@ -657,10 +656,11 @@ ElDialogPlus.OpenDialogImageSelect(
   type="info"
   width="600px"
   hiddenFooter
+  :title="cfg.title"
 )
   .edit-area
     input(type="file" accept="image/*" ref="fileInputRef" @change="OnPickFile" style="display:none")
-    .title {{ cfg.title }}
+
     //- 預覽區（RWD）
     .preview(ref="containerRef" @click="OnPreviewClick")
       canvas(ref="canvasRef" @pointerdown="OnPointerDown" @pointermove="OnPointerMove" @pointerup="OnPointerUp" @pointerleave="OnPointerUp")
@@ -704,13 +704,6 @@ ElDialogPlus.OpenDialogImageSelect(
     @include center(8px);
   }
 
-  .title {
-    @include fs(24px, 700);
-    text-align: center;
-    color: #CCA385;
-    transform: translateY(-6px);
-  }
-
   .preview {
     position: relative;
     width: 100%;
@@ -739,10 +732,9 @@ ElDialogPlus.OpenDialogImageSelect(
       @include center;
       @include fs(28px);
       border-radius: 10px;
-      background: #FBF6E6;
-      color: #6A574E;
+      background-color: #fff ;
+      color: $primary;
       opacity: 0.7;
-      
     }
   }
 
@@ -758,29 +750,31 @@ ElDialogPlus.OpenDialogImageSelect(
     justify-content: flex-end;
     gap: 8px;
   }
+
   .ctrl-btn {
     @include btn-click;
     @include wh(35px, 35px);
     @include center;
     @include fs(28px);
     border-radius: 10px;
-    background: #CCA385;
+    background: $primary;
     color: white;
     opacity: 0.7;
   }
+
   .confirm-btn {
     @include btn-click;
     @include wh(100%, 40px);
     @include center;
     @include fs(16px, bold);
     border-radius: 8px;
-    background: #CCA385;
+    background: $primary;
     color: white;
     opacity: 0.7;
     &[disabled="true"] {
       cursor: not-allowed;
-      opacity: 0.5;
       background: gray;
+      opacity: .5;
     }
   }
 }

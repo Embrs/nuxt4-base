@@ -117,10 +117,6 @@
   &:active {
     filter: brightness(.9);
   }
-  &[disabled] {
-    cursor: not-allowed;
-    opacity: .5;
-  }
 }
 
 // 限制最大寬度與保留寬度

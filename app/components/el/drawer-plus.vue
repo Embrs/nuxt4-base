@@ -16,7 +16,8 @@ type Props = {
   type?: 'edit' | 'info' //  編輯 一般模式
   direction?: 'rtl' | 'ltr' | 'ttb' | 'btt' // 方向
   isChange?: boolean // 是否被改過
-  hiddenFooter?:boolean // 隱藏 footer
+  hiddenHeader?: boolean // 隱藏 header
+  hiddenFooter?: boolean // 隱藏 footer
   isRemovePadding?: boolean // 是否移除 padding
   isbodyFull?: boolean // body 填滿
 }
@@ -27,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'info',
   direction: 'rtl',
   isChange: false,
+  hiddenHeader: false,
   hiddenFooter: false,
   isRemovePadding: false,
   isbodyFull: false
@@ -70,6 +72,8 @@ ElDrawer(
   lock-scroll
   @closed="EmitClose"
 )
+  template(v-if="!props.hiddenHeader" #header)
+    slot(name="header")
   template(#default)
     div(
       v-scroll-more="{lisent: '.el-drawer__body', show: '.el-drawer__body'}"

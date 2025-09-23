@@ -9,15 +9,23 @@
 .g-row {
   @include row;
 }
+
 // 橫向排列 換行
 .g-col{
   @include col;
 }
+
 // 置中 橫向排列
 .g-center-row{
   @include center-row;
 }
+
 // 置中 垂直排列
 .g-center-col{
   @include center-col;
+}
+
+// 隱藏
+.g-hidden {
+  display: none;
 }

@@ -68,7 +68,7 @@ export default defineNuxtConfig({
   // Css class 樣式 -----------------------------
   css: [
     '@/assets/styles/css-class/index.css',
-    '@/assets/styles/css-class/g-style.scss' // 全局通用
+    '@/assets/styles/css-class/g-style.scss', // 全局通用
   ],
 
   // == Modules ===============================================================================================
@@ -229,6 +229,7 @@ export default defineNuxtConfig({
             @use '@/assets/styles/scss-tool/mixin.scss' as *;
             @use '@/assets/styles/scss-tool/font-size.scss' as *;
             @use '@/assets/styles/scss-tool/rwd.scss' as *;
+            @use '@/assets/styles/scss-tool/element-plus/index.scss' as *;
           `,
           quietDeps: true // 關閉警告
         }

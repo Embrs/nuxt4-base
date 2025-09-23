@@ -33,24 +33,24 @@ const ApiDemo = async() => {
   .row-item
     p {{ $t('about.title') }}
   
-  DemoItem1
-  //- NuxtLink(to="/demo/pinia") DemoPinia
-  ElButton 123
-  .box
-    .test1
-      p 123456789
-    .text2
-      p abc
-  p {{ $colorMode.preference }}
-  .box2
-    img.g-img-lock(:src="$tool.CreateDemoImg()")
-  .box3
-    p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
+  //- DemoItem1
+  //- //- NuxtLink(to="/demo/pinia") DemoPinia
+  //- ElButton 123
+  //- .box
+  //-   .test1
+  //-     p 123456789
+  //-   .text2
+  //-     p abc
+  //- p {{ $colorMode.preference }}
+  //- .box2
+  //-   img.g-img-lock(:src="$tool.CreateDemoImg()")
+  //- .box3
+  //-   p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
 
-  ElButton(@click="OpenDialogDemo") Open DialogDemo
-  ElButton(@click="$open.DialogVideoRecording") Open DialogVideoRecording
-  ElButton(@click="$open.DialogImageEdit") Open DialogImageEdit
-  ElButton Test
+  ElButton(type="primary" @click="OpenDialogDemo") Open DialogDemo
+  ElButton(type="success" @click="$open.DialogVideoRecording") Open DialogVideoRecording
+  ElButton(type="warning" @click="$open.DialogImageEdit") Open DialogImageEdit
+  ElButton(type="danger") Test
 </template>
 
 <style lang="scss" scoped>
