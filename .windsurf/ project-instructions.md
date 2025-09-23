@@ -10,11 +10,11 @@
 - 使用 **Element Plus** 作為UI框架時，請依循官方推薦寫法。
 
 ## 命名規範
-- 變數名稱：使用 **小駝峰 lower camel case**。
-- 函式名稱：使用 **大駝峰 upper camel case**。
-- TS type interface：使用 **大駝峰 upper camel case**。
-- 檔案名稱：使用 **烤肉串 kebab-case**。
-- 常數：使用 **全大寫蛇形命名 (UPPER_SNAKE_CASE)**。
+- 變數名稱：使用 **小駝峰 camelCase** 命名。
+- 函式名稱：使用 **大駝峰 CamelCase** 命名。
+- TS type interface：使用 **大駝峰 CamelCase** 命名。
+- 檔案名稱：使用 **烤肉串 kebab-case** 命名。
+- 常數：使用 **全大寫蛇形命名 (UPPER_SNAKE_CASE)** 命名。
 
 ## 程式風格
 - 一律使用 `const` 或 `let`，不要使用 `var`。
