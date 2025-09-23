@@ -16,6 +16,7 @@ export const StoreSelf = defineStore('StoreSelf', () => {
   const ClearInfo = () => {
     // 清除 token
     SetToken('');
+    navigateTo('/sign-in');
   };
 
   /** 登出 */

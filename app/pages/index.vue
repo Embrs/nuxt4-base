@@ -21,10 +21,10 @@ const ApiDemo = async() => {
   div(class="g-row")
     p PageIndex
     p 123
-  button(@click="() => storeTheme.ChangeTheme('dark')") dark;
-  button(@click="() => storeTheme.ChangeTheme('light')") light;
-  button(@click="() => $mitt.EmitRefresh()") EmitRefresh;
-  button(@click="ApiDemo") ApiDemo;
+  ElButton(@click="() => storeTheme.ChangeTheme('dark')") dark;
+  ElButton(@click="() => storeTheme.ChangeTheme('light')") light;
+  ElButton(@click="() => $mitt.EmitRefresh()") EmitRefresh;
+  ElButton(@click="ApiDemo") ApiDemo;
   .row-item
     SwitchLocalePathLink(
       v-for="localeItem in locales" :key="localeItem.code" :locale="localeItem.code"
@@ -35,7 +35,7 @@ const ApiDemo = async() => {
   
   DemoItem1
   //- NuxtLink(to="/demo/pinia") DemoPinia
-  button 123
+  ElButton 123
   .box
     .test1
       p 123456789
@@ -47,7 +47,9 @@ const ApiDemo = async() => {
   .box3
     p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
 
-  button(@click="OpenDialogDemo") Open DialogDemo
+  ElButton(@click="OpenDialogDemo") Open DialogDemo
+  ElButton(@click="$open.DialogVideoRecording") Open DialogVideoRecording
+  ElButton(@click="$open.DialogImageEdit") Open DialogImageEdit
   ElButton Test
 </template>
 

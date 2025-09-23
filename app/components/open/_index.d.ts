@@ -1,6 +1,8 @@
 // 組件群 -----------------------------------------------------------------------------------------------
 type OpenComponent = 
   'OpenDialogDemo' 
+  | 'OpenDialogVideoRecording' // 影片錄製
+  | 'OpenDialogImageSelect' // 圖片選擇
   // | 'OpenDialogDemo2'
   // TODO 組件加完後，要設定
 

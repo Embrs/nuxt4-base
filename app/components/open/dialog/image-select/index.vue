@@ -1,0 +1,788 @@
+<script setup lang="ts">
+// OpenDialogImageSelect // 圖片選擇與編輯 
+// -- 引入 --------------------------------------------------------------------------------------------
+const $option = UseOpenComOption();
+
+// -- 資料 --------------------------------------------------------------------------------------------
+type ImageEditParams = {
+  aspectW?: number; // 裁切寬比，預設 3
+  aspectH?: number; // 裁切高比，預設 4
+  preferJPEG?: boolean; // 匯出預設使用 JPEG
+  cropMinW?: number; // 最小寬（0..1，依輸出寬比）
+  cropMaxW?: number; // 最大寬（0..1）
+  snapPx?: number; // 貼齊邊界像素閾值（預設 8px）
+  lineColor?: string; // 裁切框線顏色
+  lineWidth?: number; // 裁切框線寬（裝置像素，會等比縮放），預設 4
+  dash?: [number, number]; // 虛線（裝置像素，會等比縮放）
+  handleColor?: string; // 控制點顏色
+  handleSize?: number; // 控制點尺寸（裝置像素，會等比縮放）
+  title?: string; // 對話框標題
+};
+type Props = {
+  resolve: (image: File) => void; // 回傳已編輯的圖片檔案
+  params?: ImageEditParams;
+}
+const props = defineProps<Props>();
+
+const cfg = computed(() => ({
+  aspectW: props.params?.aspectW ?? 3,
+  aspectH: props.params?.aspectH ?? 4,
+  preferJPEG: props.params?.preferJPEG ?? true,
+  cropMinW: props.params?.cropMinW ?? 0.1,
+  cropMaxW: props.params?.cropMaxW ?? 1,
+  snapPx: props.params?.snapPx ?? 8,
+  lineColor: props.params?.lineColor ?? 'white',
+  lineWidth: props.params?.lineWidth ?? 4,
+  dash: props.params?.dash ?? [8, 6] as [number, number],
+  handleColor: props.params?.handleColor ?? '#63c6ff',
+  handleSize: props.params?.handleSize ?? 16,
+  title: props.params?.title ?? '選擇上傳圖片'
+}));
+
+// 預覽與狀態
+const containerRef = ref<HTMLElement | null>(null);
+const canvasRef = ref<HTMLCanvasElement | null>(null);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+
+// 來源檔與位元圖
+const srcFile = ref<File | null>(null);
+const imgBitmap = shallowRef<ImageBitmap | HTMLImageElement | null>(null);
+const natural = reactive({ w: 0, h: 0, type: '' });
+
+// 變換狀態
+const transform = reactive({ angle: 0, flipX: false, flipY: false }); // angle 單位: 度，限於 90 的倍數
+
+// 裁切狀態（預設開啟）
+const cropEnabled = ref(true);
+const cropAspect = computed(() => {
+  const w = Math.max(1, cfg.value.aspectW);
+  const h = Math.max(1, cfg.value.aspectH);
+  return w / h;
+});
+
+// 裁切矩形（以旋轉後輸出空間 out.w/out.h 的座標系，使用歸一化 0..1）
+const cropRect = reactive({ x: 0, y: 0, w: 1, h: 1 });
+
+// 畫面暫存（用於事件座標轉換）
+const lastDraw = reactive({ scale: 1, angle: 0, sx: 1, sy: 1, cx: 0, cy: 0, outW: 0, outH: 0 });
+
+// 初始化裁切矩形
+const InitCropRect = () => {
+  if (!natural.w || !natural.h) return;
+  const out = GetTransformedSize(natural.w, natural.h, transform.angle);
+  // 以像素空間最大置中矩形（遵循比例）
+  const asp = cropAspect.value; // w/h
+  // 先以高度為基準算出可容納的寬度，取不超出 out 的最大值
+  const maxWByH = Math.floor(out.h * asp);
+  const cw = Math.min(out.w, maxWByH);
+  const ch = Math.floor(cw / asp);
+  cropRect.w = cw / out.w;
+  cropRect.h = ch / out.h;
+  cropRect.x = (out.w - cw) / 2 / out.w;
+  cropRect.y = (out.h - ch) / 2 / out.h;
+};
+
+// 畫面尺寸（避免 SSR 直接取用 window）
+const dpr = ref(1);
+let ro: ResizeObserver | null = null;
+
+// 監聽容器縮放，重新繪製預覽
+onMounted(() => {
+  // 初始化 DPR
+  dpr.value = Math.min((window as any).devicePixelRatio || 1, 2);
+  if (containerRef.value) {
+    ro = new ResizeObserver(() => DrawPreview());
+    ro.observe(containerRef.value);
+  }
+  nextTick(() => {
+    OnPreviewClick();
+  });
+});
+
+onBeforeUnmount(() => {
+  if (ro && containerRef.value) ro.unobserve(containerRef.value);
+  ro = null;
+});
+
+// 監看裁切開關與比例，開啟或比例變動時重新置中
+watch([cropEnabled, () => cfg.value.aspectW, () => cfg.value.aspectH], () => {
+  if (cropEnabled.value) {
+    InitCropRect();
+    nextTick(() => DrawPreview());
+  }
+});
+
+// 工具：計算旋轉後輸出尺寸
+const GetTransformedSize = (w: number, h: number, angle: number) => {
+  const a = ((angle % 360) + 360) % 360;
+  if (a === 90 || a === 270) return { w: h, h: w };
+  return { w, h };
+};
+
+// 工具：將角度歸正為 0/90/180/270
+const NormalizeAngle = (a: number) => {
+  const m = ((a % 360) + 360) % 360;
+  if (m % 90 !== 0) return Math.round(m / 90) * 90 % 360;
+  return m;
+};
+
+// 載入圖片
+const OnPickFile = async (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  const f = input.files && input.files[0];
+  if (!f) return;
+  if (!f.type.startsWith('image/')) {
+    ElMessage.error('請選擇圖片檔案');
+    return;
+  }
+  srcFile.value = f;
+  natural.type = f.type || 'image/png';
+  try {
+    if ('createImageBitmap' in window) {
+      imgBitmap.value = await createImageBitmap(f);
+      natural.w = (imgBitmap.value as ImageBitmap).width;
+      natural.h = (imgBitmap.value as ImageBitmap).height;
+    } else {
+      imgBitmap.value = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          // 釋放暫時的 object URL
+          if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+          resolve(img);
+        };
+        img.onerror = (ev) => {
+          try { if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src); } catch(err) {console.log(err);}
+          reject(ev);
+        };
+        img.src = URL.createObjectURL(f);
+      });
+      natural.w = (imgBitmap.value as HTMLImageElement).naturalWidth;
+      natural.h = (imgBitmap.value as HTMLImageElement).naturalHeight;
+    }
+    ResetTransform();
+    InitCropRect();
+    await nextTick();
+    DrawPreview();
+  } catch (err) {
+    console.error(err);
+    ElMessage.error('圖片載入失敗');
+  }
+};
+
+const TriggerPick = () => {
+  if (fileInputRef.value) fileInputRef.value.value = '';
+  fileInputRef.value?.click();
+};
+
+// 操作：旋轉/鏡像/重置
+const Rotate = (delta: number) => {
+  transform.angle = NormalizeAngle(transform.angle + delta);
+  InitCropRect();
+  DrawPreview();
+};
+
+const ToggleFlipX = () => {
+  transform.flipX = !transform.flipX;
+  InitCropRect();
+  DrawPreview();
+};
+
+const ToggleFlipY = () => {
+  transform.flipY = !transform.flipY;
+  InitCropRect();
+  DrawPreview();
+};
+
+const ResetTransform = () => {
+  transform.angle = 0;
+  transform.flipX = false;
+  transform.flipY = false;
+  InitCropRect();
+  DrawPreview();
+};
+
+const ClearImage = () => {
+  srcFile.value = null;
+  imgBitmap.value = null;
+  natural.w = 0;
+  natural.h = 0;
+  DrawPreview();
+  // 清掉後立刻開啟選擇
+  nextTick(() => TriggerPick());
+};
+
+// 繪製預覽：自適應容器（RWD），不壓縮原圖，只做顯示用縮放
+const DrawPreview = () => {
+  const cvs = canvasRef.value;
+  const box = containerRef.value;
+  const img = imgBitmap.value;
+  if (!cvs || !box) return;
+
+  const boxW = Math.max(1, box.clientWidth);
+  const boxH = Math.max(1, box.clientHeight);
+
+  // canvas 真實像素，確保在高 DPR 下依然清晰
+  const ratio = dpr.value || 1;
+  cvs.width = Math.floor(boxW * ratio);
+  cvs.height = Math.floor(boxH * ratio);
+  cvs.style.width = boxW + 'px';
+  cvs.style.height = boxH + 'px';
+
+  const ctx = cvs.getContext('2d');
+  if (!ctx) return;
+  ctx.save();
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  // 若尚未載入圖片，清空後直接返回（確保重新選擇時畫面立即被清除）
+  if (!img || !natural.w || !natural.h) {
+    ctx.restore();
+    return;
+  }
+
+  // 旋轉後的內容尺寸（以原圖尺寸計算）
+  const out = GetTransformedSize(natural.w, natural.h, transform.angle);
+
+  // 將內容置中，fit-contain 縮放（略微縮小避免四捨五入造成 1px 溢出）
+  const scale = Math.min(cvs.width / out.w, cvs.height / out.h) * 0.999;
+  const cx = cvs.width / 2;
+  const cy = cvs.height / 2;
+
+  // 當前角度（供後續使用）
+  const a = NormalizeAngle(transform.angle);
+
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+
+  // 套用旋轉與鏡像（先旋轉，再鏡像，避免鏡像時左右旋轉方向顛倒）
+  const sx = transform.flipX ? -1 : 1;
+  const sy = transform.flipY ? -1 : 1;
+  ctx.rotate((transform.angle * Math.PI) / 180);
+  ctx.scale(sx, sy);
+
+  // 將圖像中心對齊到原點並繪製（依 fit-contain 縮放，避免裁切）
+  const drawW = natural.w;
+  const drawH = natural.h;
+  ctx.drawImage(img as any, -drawW / 2, -drawH / 2, drawW, drawH);
+
+  ctx.restore();
+
+  // 繪製裁切框（以畫面座標繪製，保持觀看者看到的長寬比不因旋轉而改變）
+  if (cropEnabled.value) {
+    const contentW = out.w * scale;
+    const contentH = out.h * scale;
+    const contentX = cx - contentW / 2;
+    const contentY = cy - contentH / 2;
+
+    // 將歸一化裁切轉為畫面座標
+    const rx = contentX + cropRect.x * contentW;
+    const ry = contentY + cropRect.y * contentH;
+    const rw = cropRect.w * contentW;
+    const rh = cropRect.h * contentH;
+
+    const ctx2 = cvs.getContext('2d');
+    if (ctx2) {
+      ctx2.save();
+      ctx2.strokeStyle = cfg.value.lineColor;
+      ctx2.lineWidth = (cfg.value.lineWidth || 2); // 畫面座標，無須再被 scale 除
+      const dash = cfg.value.dash;
+      ctx2.setLineDash([dash[0], dash[1]]);
+      ctx2.strokeRect(rx, ry, rw, rh);
+
+      // 暗角（僅限於內容區域內）
+      ctx2.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx2.beginPath();
+      ctx2.rect(contentX, contentY, contentW, contentH);
+      ctx2.rect(rx, ry, rw, rh);
+      ctx2.fill('evenodd');
+
+      // 控制點（角與邊）
+      const handleSizePx = (cfg.value.handleSize || 16);
+      ctx2.setLineDash([]);
+      ctx2.fillStyle = cfg.value.handleColor;
+      const corners = [
+        { x: rx,        y: ry },        // nw
+        { x: rx + rw,   y: ry },        // ne
+        { x: rx,        y: ry + rh },   // sw
+        { x: rx + rw,   y: ry + rh },   // se
+      ];
+      for (const c of corners) ctx2.fillRect(c.x - handleSizePx / 2, c.y - handleSizePx / 2, handleSizePx, handleSizePx);
+      const edges = [
+        { x: rx + rw/2, y: ry },        // n
+        { x: rx + rw,   y: ry + rh/2 }, // e
+        { x: rx + rw/2, y: ry + rh },   // s
+        { x: rx,        y: ry + rh/2 }, // w
+      ];
+      for (const c of edges) ctx2.fillRect(c.x - handleSizePx / 2, c.y - handleSizePx / 2, handleSizePx, handleSizePx);
+      ctx2.restore();
+    }
+  }
+
+  // 存下這次繪製狀態供事件換算
+  lastDraw.scale = scale;
+  lastDraw.angle = a;
+  lastDraw.sx = sx;
+  lastDraw.sy = sy;
+  lastDraw.cx = cx;
+  lastDraw.cy = cy;
+  lastDraw.outW = out.w;
+  lastDraw.outH = out.h;
+};
+
+// ==== 裁切互動：將指標位置映射到 out 空間（旋轉後的寬高座標系） ====
+const CanvasPointToOut = (e: PointerEvent) => {
+  // 以畫面座標將滑鼠位置映射為 out 空間（未旋轉的內容邊界）中的像素位置
+  const cvs = canvasRef.value;
+  if (!cvs) return { x: 0, y: 0 };
+  const rect = cvs.getBoundingClientRect();
+  const ratio = dpr.value || 1;
+  // 轉為畫布裝置像素
+  const pxDev = (e.clientX - rect.left) * ratio;
+  const pyDev = (e.clientY - rect.top) * ratio;
+  // 內容在畫面上的方框（裝置像素）
+  const contentW = lastDraw.outW * lastDraw.scale;
+  const contentH = lastDraw.outH * lastDraw.scale;
+  const contentX = lastDraw.cx - contentW / 2;
+  const contentY = lastDraw.cy - contentH / 2;
+  // 轉為 out 空間像素
+  const relX = pxDev - contentX;
+  const relY = pyDev - contentY;
+  const outX = Math.max(0, Math.min(lastDraw.outW, (relX / contentW) * lastDraw.outW));
+  const outY = Math.max(0, Math.min(lastDraw.outH, (relY / contentH) * lastDraw.outH));
+  return { x: outX, y: outY };
+};
+
+const OutToCanvasPoint = (x: number, y: number) => {
+  // 以畫面座標將 out 空間像素轉為畫布像素（不考慮旋轉，對齊內容方框）
+  const contentW = lastDraw.outW * lastDraw.scale;
+  const contentH = lastDraw.outH * lastDraw.scale;
+  const contentX = lastDraw.cx - contentW / 2;
+  const contentY = lastDraw.cy - contentH / 2;
+  const px = contentX + (x / lastDraw.outW) * contentW;
+  const py = contentY + (y / lastDraw.outH) * contentH;
+  return { x: px, y: py };
+};
+
+// 拖曳狀態
+type DragMode = 'none' | 'move' | 'resize';
+type DragHandle = 'nw' | 'ne' | 'sw' | 'se' | 'n' | 'e' | 's' | 'w' | null;
+const drag = reactive({ mode: 'none' as DragMode, handle: null as DragHandle, start: { x: 0, y: 0 }, init: { x: 0, y: 0, w: 0, h: 0 } });
+
+const HitTestHandle = (e: PointerEvent): DragHandle => {
+  const out = { w: lastDraw.outW, h: lastDraw.outH };
+  if (!out.w || !out.h) return null;
+  const cvs = canvasRef.value;
+  if (!cvs) return null;
+  const boxRect = cvs.getBoundingClientRect();
+  const ratio = dpr.value || 1;
+  const ex = (e.clientX - boxRect.left) * ratio;
+  const ey = (e.clientY - boxRect.top) * ratio;
+  const contentW = out.w * lastDraw.scale;
+  const contentH = out.h * lastDraw.scale;
+  const contentX = lastDraw.cx - contentW / 2;
+  const contentY = lastDraw.cy - contentH / 2;
+  const rx = contentX + cropRect.x * contentW;
+  const ry = contentY + cropRect.y * contentH;
+  const rw = cropRect.w * contentW;
+  const rh = cropRect.h * contentH;
+  const handles: { id: DragHandle, x: number, y: number }[] = [
+    { id: 'nw', x: rx,       y: ry },
+    { id: 'ne', x: rx + rw,  y: ry },
+    { id: 'sw', x: rx,       y: ry + rh },
+    { id: 'se', x: rx + rw,  y: ry + rh },
+    { id: 'n',  x: rx + rw/2,y: ry },
+    { id: 'e',  x: rx + rw,  y: ry + rh/2 },
+    { id: 's',  x: rx + rw/2,y: ry + rh },
+    { id: 'w',  x: rx,       y: ry + rh/2 },
+  ];
+  const thresholdPx = Math.max(12, (cfg.value.handleSize || 16));
+  for (const h of handles) {
+    const d = Math.hypot(ex - h.x, ey - h.y);
+    if (d <= thresholdPx) return h.id;
+  }
+  return null;
+};
+
+const OnPreviewClick = () => {
+  // 僅在尚未選擇圖片時才開啟檔案選擇
+  if (!imgBitmap.value) TriggerPick();
+};
+
+const OnPointerDown = (e: PointerEvent) => {
+  if (!cropEnabled.value) return;
+  e.preventDefault();
+  const handle = HitTestHandle(e);
+  const outW = lastDraw.outW, outH = lastDraw.outH;
+  if (!outW || !outH) return;
+  const p = CanvasPointToOut(e);
+  drag.start = p;
+  drag.init = { x: cropRect.x, y: cropRect.y, w: cropRect.w, h: cropRect.h };
+  if (handle) {
+    drag.mode = 'resize';
+    drag.handle = handle;
+  } else {
+    // 點在框內才移動
+    const rx = cropRect.x * outW, ry = cropRect.y * outH, rw = cropRect.w * outW, rh = cropRect.h * outH;
+    if (p.x >= rx && p.x <= rx + rw && p.y >= ry && p.y <= ry + rh) {
+      drag.mode = 'move';
+      drag.handle = null;
+    } else {
+      drag.mode = 'none';
+    }
+  }
+  (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+};
+
+const OnPointerMove = (e: PointerEvent) => {
+  if (drag.mode === 'none') return;
+  e.preventDefault();
+  const outW = lastDraw.outW, outH = lastDraw.outH;
+  if (!outW || !outH) return;
+  const p = CanvasPointToOut(e);
+  const dx = (p.x - drag.start.x) / outW;
+  const dy = (p.y - drag.start.y) / outH;
+  if (drag.mode === 'move') {
+    let nx = drag.init.x + dx;
+    let ny = drag.init.y + dy;
+    // 邊界限制
+    nx = Math.min(Math.max(0, nx), 1 - cropRect.w);
+    ny = Math.min(Math.max(0, ny), 1 - cropRect.h);
+    cropRect.x = nx;
+    cropRect.y = ny;
+    DrawPreview();
+  } else if (drag.mode === 'resize' && drag.handle) {
+    // 固定比例，支援角與邊把手
+    const asp = cropAspect.value;
+    const outW = lastDraw.outW, outH = lastDraw.outH;
+    // 目前值
+    const w = drag.init.w, h = drag.init.h, x = drag.init.x, y = drag.init.y;
+    // 計算新 w/h 與 x/y
+    let newW = w, newH = h, newX = x, newY = y;
+
+    // 以像素比例換算：確保 (w*outW)/(h*outH)=asp
+    const WtoH = (wn: number) => (wn * outW) / (asp * outH);
+    const HtoW = (hn: number) => (hn * asp * outH) / outW;
+    const clampW = (val: number) => Math.max(cfg.value.cropMinW, Math.min(val, cfg.value.cropMaxW));
+
+    if (['nw','ne','sw','se'].includes(drag.handle)) {
+      const signX = (drag.handle === 'ne' || drag.handle === 'se') ? 1 : -1;
+      const signY = (drag.handle === 'sw' || drag.handle === 'se') ? 1 : -1;
+      let delta = Math.max(Math.abs(dx), Math.abs(dy));
+      delta *= (Math.abs(dx) >= Math.abs(dy) ? Math.sign(dx) * signX : Math.sign(dy) * signY);
+      newW = clampW(w + delta);
+      newH = WtoH(newW);
+      if (drag.handle === 'nw' || drag.handle === 'sw') newX = x + (w - newW);
+      if (drag.handle === 'nw' || drag.handle === 'ne') newY = y + (h - newH);
+    } else if (drag.handle === 'e') {
+      // 右邊為錨：以中心Y容量與右側水平容量共同限制寬度
+      const cy = y + h / 2; // 以初始中心為基準
+      const HcapY = Math.min(1, 2 * Math.min(cy, 1 - cy));
+      const WcapY = HcapY * (asp * outH) / outW; // 由比例換算成寬度容量
+      const WcapX = 1 - x; // 右側水平容量
+      const desiredW = clampW(w + dx);
+      const cappedW = Math.max(cfg.value.cropMinW, Math.min(desiredW, WcapX, WcapY, cfg.value.cropMaxW));
+      const cappedH = WtoH(cappedW);
+      const centeredY = cy - cappedH / 2;
+      newW = cappedW;
+      newH = cappedH;
+      newX = x; // 固定左邊
+      newY = Math.min(Math.max(0, centeredY), 1 - cappedH); // 只調整位置，保持寬高
+    } else if (drag.handle === 'w') {
+      // 左邊為錨：以中心Y容量與左側水平容量共同限制寬度
+      const cy = y + h / 2;
+      const HcapY = Math.min(1, 2 * Math.min(cy, 1 - cy));
+      const WcapY = HcapY * (asp * outH) / outW;
+      const WcapX = x + w; // 左側水平容量（含目前寬度）
+      const desiredW = clampW(w - dx);
+      const cappedW = Math.max(cfg.value.cropMinW, Math.min(desiredW, WcapX, WcapY, cfg.value.cropMaxW));
+      const cappedH = WtoH(cappedW);
+      const candX = x + (w - cappedW); // 固定右邊
+      const centeredY = y + (h - cappedH) / 2;
+      newW = cappedW;
+      newH = cappedH;
+      newX = candX;
+      newY = Math.min(Math.max(0, centeredY), 1 - cappedH);
+    } else if (drag.handle === 's') {
+      const candidateH = h + dy;
+      newW = clampW(HtoW(candidateH));
+      newH = WtoH(newW);
+      newY = y; // 固定上邊
+      newX = x + (w - newW) / 2;
+    } else if (drag.handle === 'n') {
+      const candidateH = h - dy;
+      newW = clampW(HtoW(candidateH));
+      newH = WtoH(newW);
+      newY = y + (h - newH); // 固定下邊
+      newX = x + (w - newW) / 2;
+    }
+
+    // （移除 e/w 的預先夾緊，改由下方單一路徑完整處理）
+    if (drag.handle === 'ne' || drag.handle === 'nw') {
+      // 以頂邊為錨：若超出上界，調整高度並依比例回推寬度，保持頂邊貼齊 0
+      if (newY < 0) {
+        const overflow = -newY;
+        let candH = newH - overflow;
+        candH = Math.max(candH, cfg.value.cropMinW);
+        newH = candH;
+        newW = HtoW(newH);
+        newY = 0;
+        if (drag.handle === 'nw') newX = x + (w - newW); else newX = x; // 左/右頂角分別維持其對應邊
+      }
+    }
+    if (drag.handle === 'w' || drag.handle === 'nw' || drag.handle === 'sw') {
+      // 以左邊為錨：若左側超界，調整寬度，保持左邊貼齊 0
+      if (newX < 0) {
+        const overflow = -newX;
+        let candW = newW - overflow;
+        candW = Math.max(candW, cfg.value.cropMinW);
+        newW = candW;
+        newH = WtoH(newW);
+        newX = 0;
+        // 依錨點重置 Y（僅角把手時才需要保持對齊）
+        if (drag.handle === 'nw') newY = y + (h - newH);
+        else if (drag.handle === 'sw') newY = y;
+      }
+    }
+
+    // 維持比例且不越界：一般情況以右/下為限制做一次比例回縮（角把手適用）
+    if (['nw','ne','sw','se','n','s'].includes(drag.handle)) {
+      const maxW = 1 - newX;
+      const maxH = 1 - newY;
+      if (newW > maxW || newH > maxH) {
+        const s = Math.min(maxW / newW, maxH / newH, 1);
+        const adjW = newW * s;
+        const adjH = newH * s;
+        if (drag.handle === 'nw' || drag.handle === 'sw') newX = x + (w - adjW);
+        if (drag.handle === 'nw' || drag.handle === 'ne') newY = y + (h - adjH);
+        newW = adjW; newH = adjH;
+      }
+    }
+
+    // 吸附（像素到 out 空間正規化）
+    const snapX = (cfg.value.snapPx * (dpr.value || 1)) / (lastDraw.scale * outW);
+    const snapY = (cfg.value.snapPx * (dpr.value || 1)) / (lastDraw.scale * outH);
+    // 左/上邊
+    if (Math.abs(newX - 0) < snapX) newX = 0;
+    if (Math.abs(newY - 0) < snapY) newY = 0;
+    // 右/下邊
+    if (Math.abs((newX + newW) - 1) < snapX) newX = 1 - newW;
+    if (Math.abs((newY + newH) - 1) < snapY) newY = 1 - newH;
+
+    // 最終嚴格邊界限制，避免貼齊後再度越界（特別是上邊界）
+    newX = Math.min(Math.max(0, newX), 1 - newW);
+    newY = Math.min(Math.max(0, newY), 1 - newH);
+    newW = Math.min(newW, 1 - newX);
+    newH = Math.min(newH, 1 - newY);
+
+    cropRect.x = newX; cropRect.y = newY; cropRect.w = newW; cropRect.h = newH;
+    DrawPreview();
+  }
+};
+
+// 指標抬起
+const OnPointerUp = (e: PointerEvent) => {
+  e.preventDefault();
+  drag.mode = 'none';
+  drag.handle = null;
+  (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+};
+
+// 匯出：以原始像素維度（含旋轉後寬高）渲染至離屏 canvas，避免失真
+const ExportImage = async () => {
+  if (!imgBitmap.value || !srcFile.value) {
+    ElMessage.warning('請先選擇圖片');
+    return;
+  }
+  const img = imgBitmap.value as any;
+  const out = GetTransformedSize(natural.w, natural.h, transform.angle);
+
+  // 先渲染完整旋轉/鏡像後的畫面到大畫布
+  const off = document.createElement('canvas');
+  off.width = out.w;
+  off.height = out.h;
+  const ctx = off.getContext('2d');
+  if (!ctx) return;
+
+  ctx.save();
+  ctx.translate(off.width / 2, off.height / 2);
+  const sx = transform.flipX ? -1 : 1;
+  const sy = transform.flipY ? -1 : 1;
+  // 先旋轉再鏡像，避免鏡像導致旋轉方向顛倒
+  ctx.rotate((transform.angle * Math.PI) / 180);
+  ctx.scale(sx, sy);
+  ctx.drawImage(img, -natural.w / 2, -natural.h / 2, natural.w, natural.h);
+  ctx.restore();
+
+  // 若開啟裁切，將居中裁切為指定比例
+  let finalCanvas = off;
+  if (cropEnabled.value) {
+    const cw = Math.round(cropRect.w * out.w);
+    const ch = Math.round(cropRect.h * out.h);
+    const sx0 = Math.floor(cropRect.x * out.w);
+    const sy0 = Math.floor(cropRect.y * out.h);
+    const cut = document.createElement('canvas');
+    cut.width = cw;
+    cut.height = ch;
+    const cctx = cut.getContext('2d');
+    if (!cctx) return;
+    cctx.drawImage(off, sx0, sy0, cw, ch, 0, 0, cw, ch);
+    finalCanvas = cut;
+  }
+
+  // 匯出 MIME 預設為 JPEG（可由 props 控制）
+  const mime = cfg.value.preferJPEG ? 'image/jpeg' : (natural.type || srcFile.value.type || 'image/png');
+  const quality = mime === 'image/jpeg' ? 0.92 : undefined;
+  const blob: Blob = await new Promise((resolve, reject) => {
+    finalCanvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob 失敗'))), mime, quality as any);
+  });
+
+  // 產生新檔案名稱
+  const name = (() => {
+    const n = srcFile.value!.name || 'image';
+    const dot = n.lastIndexOf('.');
+    const base = dot > -1 ? n.slice(0, dot) : n;
+    const ext = dot > -1 ? n.slice(dot) : '';
+    return `${base}-edited${ext || (mime === 'image/png' ? '.png' : mime === 'image/jpeg' ? '.jpg' : '')}`;
+  })();
+
+  const outFile = new File([blob], name, { type: blob.type, lastModified: Date.now() });
+  props.resolve(outFile);
+  $option.OnClose();
+};
+
+
+</script>
+
+<template lang="pug">
+ElDialogPlus.OpenDialogImageSelect(
+  v-model="$option.visible.value"
+  type="info"
+  width="600px"
+  hiddenFooter
+)
+  .edit-area
+    input(type="file" accept="image/*" ref="fileInputRef" @change="OnPickFile" style="display:none")
+    .title {{ cfg.title }}
+    //- 預覽區（RWD）
+    .preview(ref="containerRef" @click="OnPreviewClick")
+      canvas(ref="canvasRef" @pointerdown="OnPointerDown" @pointermove="OnPointerMove" @pointerup="OnPointerUp" @pointerleave="OnPointerUp")
+      //- 刪除按鈕（在有圖時顯示）
+      .delete-btn(v-if="imgBitmap" @click.stop="ClearImage") 
+        NuxtIcon(name="my-icon:trash")
+      .placeholder(v-if="!imgBitmap") 點擊這裡選擇圖片
+
+    //- 工具列（移到圖片下方）
+    .toolbar
+      ElTooltip(effect="dark" content="向左旋轉" placement="top")
+        .ctrl-btn(@click="() => Rotate(-90)")
+          NuxtIcon(name="my-icon:rotate-l")
+      ElTooltip(effect="dark" content="向右旋轉" placement="top")
+        .ctrl-btn(@click="() => Rotate(90)")
+          NuxtIcon(name="my-icon:rotate-r")
+      ElTooltip(effect="dark" content="水平鏡像" placement="top")
+        .ctrl-btn(@click="ToggleFlipX")
+          NuxtIcon(name="my-icon:mirror")
+      //- ElTooltip(effect="dark" content="垂直鏡像" placement="top")
+      //-   .ctrl-btn(@click="ToggleFlipY")
+      //-     NuxtIcon(name="my-icon:mirror-v")
+      ElTooltip(effect="dark" content="重置" placement="top")
+        .ctrl-btn(@click="ResetTransform")
+          NuxtIcon(name="my-icon:reset")
+
+    //- 底部操作
+    .footer
+    .confirm-btn(type="primary" :disabled="!imgBitmap" @click="ExportImage") 確認
+</template>
+
+<style lang="scss" scoped>
+.OpenDialogImageSelect {
+  .edit-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .toolbar {
+    @include center(8px);
+  }
+
+  .title {
+    @include fs(24px, 700);
+    text-align: center;
+    color: #CCA385;
+    transform: translateY(-6px);
+  }
+
+  .preview {
+    position: relative;
+    width: 100%;
+    // RWD 高度策略：桌機較高，手機較矮
+    height: 60vh;
+    max-height: 640px;
+    min-height: 240px;
+    // border: 2px dashed #6A574E;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #00000094;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    .placeholder {
+      position: absolute;
+      color: white;
+      @include fs(24px);
+    }
+    .delete-btn {
+      @include absolute('tr', 4px, 4px);
+      @include btn-click;
+      @include wh(35px, 35px);
+      @include center;
+      @include fs(28px);
+      border-radius: 10px;
+      background: #FBF6E6;
+      color: #6A574E;
+      opacity: 0.7;
+      
+    }
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none; // 允許 pointer 事件拖曳
+  }
+
+  .footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .ctrl-btn {
+    @include btn-click;
+    @include wh(35px, 35px);
+    @include center;
+    @include fs(28px);
+    border-radius: 10px;
+    background: #CCA385;
+    color: white;
+    opacity: 0.7;
+  }
+  .confirm-btn {
+    @include btn-click;
+    @include wh(100%, 40px);
+    @include center;
+    @include fs(16px, bold);
+    border-radius: 8px;
+    background: #CCA385;
+    color: white;
+    opacity: 0.7;
+    &[disabled="true"] {
+      cursor: not-allowed;
+      opacity: 0.5;
+      background: gray;
+    }
+  }
+}
+
+</style>

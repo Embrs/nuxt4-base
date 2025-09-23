@@ -1,5 +1,5 @@
 /** 插入開啟組件（不用動） */
-const Open = <T>(componentName: OpenComponent, params: any): Promise<T> => {
+const Open = <T>(componentName: OpenComponent, params: any = {}): Promise<T> => {
   const storeOpen = StoreOpen();
   return new Promise<T>((resolve) => {
     storeOpen.OnOpen<T>({ 
@@ -29,6 +29,10 @@ export default {
   /** 關閉指定名稱 組件 */
   CloseName: (name: OpenComponent | OpenComponent[]) => CloseName(name),
   /** 開啟測試 */
-  DialogDemo: (params: DialogDemoParams) => Open('OpenDialogDemo', params)
+  DialogDemo: (params: DialogDemoParams) => Open('OpenDialogDemo', params),
+  /** 影片錄製 */
+  DialogVideoRecording: () => Open<File>('OpenDialogVideoRecording'),
+  /** 圖片選擇 */
+  DialogImageEdit: () => Open<File>('OpenDialogImageSelect')
   // TODO 組件加完後，要設定
 };
