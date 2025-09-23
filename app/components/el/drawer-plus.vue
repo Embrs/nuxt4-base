@@ -60,33 +60,75 @@ const EmitClose = () => {
 </script>
 
 <template lang="pug">
-ElDrawer(
-  v-model="visible"
-  v-bind="$attrs"
-  :type="props.type"
-  :title="props.title"
-  :direction="storeTool.isMobile ? 'btt':props.direction"
-  :size="storeTool.isMobile ? '95%':props.width"
-  :before-close="OnHandleClose"
-  :close-on-click-modal="false"
-  lock-scroll
-  @closed="EmitClose"
-)
-  template(v-if="!props.hiddenHeader" #header)
-    slot(name="header")
-  template(#default)
-    div(
-      v-scroll-more="{lisent: '.el-drawer__body', show: '.el-drawer__body'}"
-      :class="{'drawer-content-area': !props.isRemovePadding, 'is-body-full':props.isbodyFull}"
-    )
-      slot
-  template(v-if="!props.hiddenFooter" #footer)
-    slot(name="footer" :AskClose="OnHandleClose")
+.ElDrawerPlus
+  ElDrawer(
+    v-model="visible"
+    v-bind="$attrs"
+    :type="props.type"
+    :title="props.title"
+    :direction="storeTool.isMobile ? 'btt':props.direction"
+    :size="storeTool.isMobile ? '95%':props.width"
+    :before-close="OnHandleClose"
+    :close-on-click-modal="false"
+    lock-scroll
+    @closed="EmitClose"
+  )
+    template(v-if="!props.hiddenHeader" #header)
+      slot(name="header")
+    template(#default)
+      div(
+        v-scroll-more="{lisent: '.el-drawer__body', show: '.el-drawer__body'}"
+        :class="{'drawer-content-area': !props.isRemovePadding, 'is-body-full':props.isbodyFull}"
+      )
+        slot
+    template(v-if="!props.hiddenFooter" #footer)
+      slot(name="footer" :AskClose="OnHandleClose")
 </template>
 
 <style lang="scss" scoped>
 // 佈局 ----
+.ElDrawerPlus {
+  :deep(.el-drawer) {
+    .el-drawer__body {
+      padding: 0 !important;
+    }
+    .el-drawer__header {
+      padding: 10px !important;
+      margin: 0 !important;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
 
+    .el-drawer__footer {
+      border-top: 1px solid #eee;
+      padding: 10px 20px !important;
+      margin: 0 !important;
+    } 
+
+    &[type="info"] {
+      .el-drawer__header {
+        background-color: #fff;
+      }
+      .el-drawer__header span,
+    
+      .el-drawer__close-btn {
+        color: var(--primary);
+        font-weight: 700;
+      }
+    }
+
+    &[type="edit"] {
+      .el-drawer__header {
+        background-color: var(--primary);
+      }
+      .el-drawer__header span,
+      .el-drawer__close-btn {
+        color: #fff;
+        font-weight: 700;
+      } 
+    }
+  }
+}
 // 組件 ----
 
 .drawer-content-area {

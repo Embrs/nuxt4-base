@@ -28,8 +28,11 @@ export default {
   CloseAll: () => StoreOpen().OnCloseAll(),
   /** 關閉指定名稱 組件 */
   CloseName: (name: OpenComponent | OpenComponent[]) => CloseName(name),
+  // -----------------------------------------------------------------------------------------------
   /** 開啟測試 */
   DialogDemo: (params: DialogDemoParams) => Open('OpenDialogDemo', params),
+  /** 開啟測試 抽屜 */
+  DrawerDemoInfo: () => Open('OpenDrawerDemoInfo'),
   /** 影片錄製 */
   DialogVideoRecording: () => Open<File>('OpenDialogVideoRecording'),
   /** 圖片選擇 */

@@ -50,6 +50,7 @@ const ApiDemo = async() => {
   ElButton(type="primary" @click="OpenDialogDemo") Open DialogDemo
   ElButton(type="success" @click="$open.DialogVideoRecording") Open DialogVideoRecording
   ElButton(type="warning" @click="$open.DialogImageEdit") Open DialogImageEdit
+  ElButton(type="info" @click="$open.DrawerDemoInfo") Open DrawerDemoInfo
   ElButton(type="danger") Test
 </template>
 
