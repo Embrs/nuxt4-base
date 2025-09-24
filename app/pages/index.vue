@@ -33,20 +33,12 @@ const ApiDemo = async() => {
   .row-item
     p {{ $t('about.title') }}
   
-  //- DemoItem1
-  //- //- NuxtLink(to="/demo/pinia") DemoPinia
-  //- ElButton 123
-  //- .box
-  //-   .test1
-  //-     p 123456789
-  //-   .text2
-  //-     p abc
-  //- p {{ $colorMode.preference }}
-  //- .box2
-  //-   img.g-img-lock(:src="$tool.CreateDemoImg()")
-  //- .box3
-  //-   p(v-for="item in 100" :key="item" v-motion-slide-visible-bottom ) {{ item }}
-
+  .box-4 
+    .box-item(v-for="item in 3" :key="item")
+  .box-5 
+    .box-item(v-for="item in 3" :key="item")
+  .box-6 
+    .box-item(v-for="item in 3" :key="item")
   ElButton(type="primary" @click="OpenDialogDemo") Open DialogDemo
   ElButton(type="success" @click="$open.DialogVideoRecording") Open DialogVideoRecording
   ElButton(type="warning" @click="$open.DialogImageEdit") Open DialogImageEdit
@@ -79,17 +71,44 @@ const ApiDemo = async() => {
     }
     
   }
-  .box2 {
-    @include wh(300px, 300px);
-    background-color: $demo;
-    overflow: hidden;
-  }
+
 }
 
 // 組件 ----
-.box3 {
-  @include wh(400px, 400px);
-  background-color: blue;
-  overflow: auto;
+
+.box-4 {
+  @include rwd-pc {
+    @include grid-warp(200px, 20px);
+  }
+  @include rwd-mobile {
+    @include grid-warp-fit(100px, 20px);
+  }
+  .box-item {
+    width: 100%;
+    padding-bottom: 100%;
+    background-color: red;
+  }
+}
+
+.box-5   {
+  @include grid-warp-fit(100px, 20px);
+  .box-item {
+    width: 100%;
+    padding-bottom: 100%;
+    background-color: blue;
+  }
+}
+.box-6 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 20px;
+  display: flex;
+  .box-item {
+    width: 100px;
+    // max-width: 300px;
+    padding-bottom: 10%;
+    background-color: green;
+  }
 }
 </style>

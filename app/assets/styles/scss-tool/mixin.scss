@@ -57,7 +57,7 @@
   @include center-row($gap);
 }
 
-// 稠密 grid
+// grid 自動稠密
 @mixin auto-grid($gap: 0) {
   display: grid;
   grid-auto-columns: 1fr;
@@ -75,6 +75,19 @@
 // Grid 重疊置中
 @mixin grid-center($area: "area-1") {
   @include grid-place($area, center, center);
+}
+
+// Grid 橫向排列 自動換行 會留白
+@mixin grid-warp($min-width: 100px, $gap: 0) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min-width, 1fr));
+  gap: $gap;
+}
+// Grid 橫向排列 自動換行 不會留白
+@mixin grid-warp-fit($min-width: 100px, $gap: 0) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: $gap;
 }
 
 // 文字單行
