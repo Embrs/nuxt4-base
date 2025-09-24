@@ -49,6 +49,8 @@ const srcFile = ref<File | null>(null);
 const imgBitmap = shallowRef<ImageBitmap | HTMLImageElement | null>(null);
 const natural = reactive({ w: 0, h: 0, type: '' });
 
+const hasImage = computed(() => Boolean(imgBitmap.value && natural.w && natural.h));
+
 // 變換狀態
 const transform = reactive({ angle: 0, flipX: false, flipY: false }); // angle 單位: 度，限於 90 的倍數
 
@@ -85,6 +87,8 @@ const InitCropRect = () => {
 // 畫面尺寸（避免 SSR 直接取用 window）
 const dpr = ref(1);
 let ro: ResizeObserver | null = null;
+
+const getDevicePixelRatio = () => dpr.value || 1;
 
 // 監聽容器縮放，重新繪製預覽
 onMounted(() => {
@@ -124,6 +128,23 @@ const NormalizeAngle = (a: number) => {
   const m = ((a % 360) + 360) % 360;
   if (m % 90 !== 0) return Math.round(m / 90) * 90 % 360;
   return m;
+};
+
+// 工具：依旋轉角度換算實際鏡像軸向（確保旋轉 90/270 度後仍維持水平/垂直的視覺語意）
+const GetEffectiveFlipScale = (angle: number, flipX: boolean, flipY: boolean) => {
+  const swapAxis = NormalizeAngle(angle) % 180 !== 0;
+  const [targetX, targetY] = swapAxis ? [flipY, flipX] : [flipX, flipY];
+  return {
+    sx: targetX ? -1 : 1,
+    sy: targetY ? -1 : 1,
+  };
+};
+
+const ApplyImageTransform = (ctx: CanvasRenderingContext2D, angle: number, flipX: boolean, flipY: boolean) => {
+  const flip = GetEffectiveFlipScale(angle, flipX, flipY);
+  ctx.rotate((angle * Math.PI) / 180);
+  ctx.scale(flip.sx, flip.sy);
+  return flip;
 };
 
 // 載入圖片
@@ -215,14 +236,13 @@ const ClearImage = () => {
 const DrawPreview = () => {
   const cvs = canvasRef.value;
   const box = containerRef.value;
-  const img = imgBitmap.value;
   if (!cvs || !box) return;
 
   const boxW = Math.max(1, box.clientWidth);
   const boxH = Math.max(1, box.clientHeight);
 
   // canvas 真實像素，確保在高 DPR 下依然清晰
-  const ratio = dpr.value || 1;
+  const ratio = getDevicePixelRatio();
   cvs.width = Math.floor(boxW * ratio);
   cvs.height = Math.floor(boxH * ratio);
   cvs.style.width = boxW + 'px';
@@ -233,11 +253,12 @@ const DrawPreview = () => {
   ctx.save();
   ctx.clearRect(0, 0, cvs.width, cvs.height);
   // 若尚未載入圖片，清空後直接返回（確保重新選擇時畫面立即被清除）
-  if (!img || !natural.w || !natural.h) {
+  if (!hasImage.value) {
     ctx.restore();
     return;
   }
 
+  const img = imgBitmap.value as any;
   // 旋轉後的內容尺寸（以原圖尺寸計算）
   const out = GetTransformedSize(natural.w, natural.h, transform.angle);
 
@@ -253,10 +274,7 @@ const DrawPreview = () => {
   ctx.scale(scale, scale);
 
   // 套用旋轉與鏡像（先旋轉，再鏡像，避免鏡像時左右旋轉方向顛倒）
-  const sx = transform.flipX ? -1 : 1;
-  const sy = transform.flipY ? -1 : 1;
-  ctx.rotate((transform.angle * Math.PI) / 180);
-  ctx.scale(sx, sy);
+  const flip = ApplyImageTransform(ctx, transform.angle, transform.flipX, transform.flipY);
 
   // 將圖像中心對齊到原點並繪製（依 fit-contain 縮放，避免裁切）
   const drawW = natural.w;
@@ -277,50 +295,46 @@ const DrawPreview = () => {
     const ry = contentY + cropRect.y * contentH;
     const rw = cropRect.w * contentW;
     const rh = cropRect.h * contentH;
+    ctx.save();
+    ctx.strokeStyle = cfg.value.lineColor;
+    ctx.lineWidth = (cfg.value.lineWidth || 2); // 畫面座標，無須再被 scale 除
+    const dash = cfg.value.dash;
+    ctx.setLineDash([dash[0], dash[1]]);
+    ctx.strokeRect(rx, ry, rw, rh);
 
-    const ctx2 = cvs.getContext('2d');
-    if (ctx2) {
-      ctx2.save();
-      ctx2.strokeStyle = cfg.value.lineColor;
-      ctx2.lineWidth = (cfg.value.lineWidth || 2); // 畫面座標，無須再被 scale 除
-      const dash = cfg.value.dash;
-      ctx2.setLineDash([dash[0], dash[1]]);
-      ctx2.strokeRect(rx, ry, rw, rh);
+    // 暗角（僅限於內容區域內）
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.rect(contentX, contentY, contentW, contentH);
+    ctx.rect(rx, ry, rw, rh);
+    ctx.fill('evenodd');
 
-      // 暗角（僅限於內容區域內）
-      ctx2.fillStyle = 'rgba(0,0,0,0.35)';
-      ctx2.beginPath();
-      ctx2.rect(contentX, contentY, contentW, contentH);
-      ctx2.rect(rx, ry, rw, rh);
-      ctx2.fill('evenodd');
-
-      // 控制點（角與邊）
-      const handleSizePx = (cfg.value.handleSize || 16);
-      ctx2.setLineDash([]);
-      ctx2.fillStyle = cfg.value.handleColor;
-      const corners = [
-        { x: rx,        y: ry },        // nw
-        { x: rx + rw,   y: ry },        // ne
-        { x: rx,        y: ry + rh },   // sw
-        { x: rx + rw,   y: ry + rh },   // se
-      ];
-      for (const c of corners) ctx2.fillRect(c.x - handleSizePx / 2, c.y - handleSizePx / 2, handleSizePx, handleSizePx);
-      const edges = [
-        { x: rx + rw/2, y: ry },        // n
-        { x: rx + rw,   y: ry + rh/2 }, // e
-        { x: rx + rw/2, y: ry + rh },   // s
-        { x: rx,        y: ry + rh/2 }, // w
-      ];
-      for (const c of edges) ctx2.fillRect(c.x - handleSizePx / 2, c.y - handleSizePx / 2, handleSizePx, handleSizePx);
-      ctx2.restore();
-    }
+    // 控制點（角與邊）
+    const handleSizePx = (cfg.value.handleSize || 16);
+    ctx.setLineDash([]);
+    ctx.fillStyle = cfg.value.handleColor;
+    const corners = [
+      { x: rx,        y: ry },        // nw
+      { x: rx + rw,   y: ry },        // ne
+      { x: rx,        y: ry + rh },   // sw
+      { x: rx + rw,   y: ry + rh },   // se
+    ];
+    for (const c of corners) ctx.fillRect(c.x - handleSizePx / 2, c.y - handleSizePx / 2, handleSizePx, handleSizePx);
+    const edges = [
+      { x: rx + rw/2, y: ry },        // n
+      { x: rx + rw,   y: ry + rh/2 }, // e
+      { x: rx + rw/2, y: ry + rh },   // s
+      { x: rx,        y: ry + rh/2 }, // w
+    ];
+    for (const c of edges) ctx.fillRect(c.x - handleSizePx / 2, c.y - handleSizePx / 2, handleSizePx, handleSizePx);
+    ctx.restore();
   }
 
   // 存下這次繪製狀態供事件換算
   lastDraw.scale = scale;
   lastDraw.angle = a;
-  lastDraw.sx = sx;
-  lastDraw.sy = sy;
+  lastDraw.sx = flip.sx;
+  lastDraw.sy = flip.sy;
   lastDraw.cx = cx;
   lastDraw.cy = cy;
   lastDraw.outW = out.w;
@@ -333,7 +347,7 @@ const CanvasPointToOut = (e: PointerEvent) => {
   const cvs = canvasRef.value;
   if (!cvs) return { x: 0, y: 0 };
   const rect = cvs.getBoundingClientRect();
-  const ratio = dpr.value || 1;
+  const ratio = getDevicePixelRatio();
   // 轉為畫布裝置像素
   const pxDev = (e.clientX - rect.left) * ratio;
   const pyDev = (e.clientY - rect.top) * ratio;
@@ -366,13 +380,101 @@ type DragMode = 'none' | 'move' | 'resize';
 type DragHandle = 'nw' | 'ne' | 'sw' | 'se' | 'n' | 'e' | 's' | 'w' | null;
 const drag = reactive({ mode: 'none' as DragMode, handle: null as DragHandle, start: { x: 0, y: 0 }, init: { x: 0, y: 0, w: 0, h: 0 } });
 
+type CornerHandle = 'nw' | 'ne' | 'sw' | 'se';
+
+const isCornerHandle = (handle: DragHandle): handle is CornerHandle => Boolean(handle && ['nw', 'ne', 'sw', 'se'].includes(handle));
+
+const getCornerDirection = (handle: CornerHandle) => {
+  switch (handle) {
+    case 'ne': return { sx: 1, sy: -1 } as const;
+    case 'se': return { sx: 1, sy: 1 } as const;
+    case 'sw': return { sx: -1, sy: 1 } as const;
+    case 'nw':
+    default: return { sx: -1, sy: -1 } as const;
+  }
+};
+
+const getCornerAnchor = (handle: CornerHandle, rect: { x: number; y: number; w: number; h: number }) => {
+  switch (handle) {
+    case 'ne':
+      return { x: rect.x, y: rect.y + rect.h };
+    case 'se':
+      return { x: rect.x, y: rect.y };
+    case 'sw':
+      return { x: rect.x + rect.w, y: rect.y };
+    case 'nw':
+    default:
+      return { x: rect.x + rect.w, y: rect.y + rect.h };
+  }
+};
+
+const computeCornerResize = (params: {
+  handle: CornerHandle;
+  pointerPx: { x: number; y: number };
+  initRect: { x: number; y: number; w: number; h: number };
+  outSize: { w: number; h: number };
+  aspect: number;
+  config: typeof cfg.value;
+}) => {
+  const { handle, pointerPx, initRect, outSize, aspect, config } = params;
+  if (!outSize.w || !outSize.h) return null;
+  const anchorNorm = getCornerAnchor(handle, initRect);
+  const dir = getCornerDirection(handle);
+  const anchorPx = { x: anchorNorm.x * outSize.w, y: anchorNorm.y * outSize.h };
+
+  const deltaX = pointerPx.x - anchorPx.x;
+  const deltaY = pointerPx.y - anchorPx.y;
+  const effDeltaX = dir.sx * deltaX < 0 ? 0 : Math.abs(deltaX);
+  const effDeltaY = dir.sy * deltaY < 0 ? 0 : Math.abs(deltaY);
+
+  const minWidthPx = config.cropMinW * outSize.w;
+  const maxWidthByConfigPx = config.cropMaxW * outSize.w;
+  const horizontalLimitNorm = dir.sx > 0 ? (1 - anchorNorm.x) : anchorNorm.x;
+  const horizontalLimitPx = horizontalLimitNorm * outSize.w;
+  const verticalLimitNorm = dir.sy > 0 ? (1 - anchorNorm.y) : anchorNorm.y;
+  const verticalLimitPx = verticalLimitNorm * outSize.h;
+  const maxWidthByHorizontalPx = horizontalLimitPx;
+  const maxWidthByVerticalPx = verticalLimitPx * aspect;
+  const rawMaxWidthPx = Math.min(maxWidthByConfigPx, maxWidthByHorizontalPx, maxWidthByVerticalPx);
+  const maxWidthPx = Math.max(minWidthPx, rawMaxWidthPx);
+  if (maxWidthPx <= 0) return null;
+
+  const clampWidthPx = (val: number) => Math.min(Math.max(val, minWidthPx), maxWidthPx);
+
+  const buildCandidate = (widthPxRaw: number) => {
+    const widthPx = clampWidthPx(widthPxRaw);
+    const heightPx = widthPx / aspect;
+    const cornerPx = {
+      x: anchorPx.x + dir.sx * widthPx,
+      y: anchorPx.y + dir.sy * heightPx,
+    };
+    return { widthPx, heightPx, cornerPx };
+  };
+
+  const candidateByWidth = buildCandidate(effDeltaX);
+  const candidateByHeight = buildCandidate(effDeltaY * aspect);
+  const errorWidth = Math.hypot(pointerPx.x - candidateByWidth.cornerPx.x, pointerPx.y - candidateByWidth.cornerPx.y);
+  const errorHeight = Math.hypot(pointerPx.x - candidateByHeight.cornerPx.x, pointerPx.y - candidateByHeight.cornerPx.y);
+  const chosen = errorHeight < errorWidth ? candidateByHeight : candidateByWidth;
+
+  const newW = chosen.widthPx / outSize.w;
+  const newH = chosen.heightPx / outSize.h;
+  let newX = dir.sx > 0 ? anchorNorm.x : anchorNorm.x - newW;
+  let newY = dir.sy > 0 ? anchorNorm.y : anchorNorm.y - newH;
+
+  newX = Math.min(Math.max(0, newX), 1 - newW);
+  newY = Math.min(Math.max(0, newY), 1 - newH);
+
+  return { x: newX, y: newY, w: newW, h: newH };
+};
+
 const HitTestHandle = (e: PointerEvent): DragHandle => {
   const out = { w: lastDraw.outW, h: lastDraw.outH };
   if (!out.w || !out.h) return null;
   const cvs = canvasRef.value;
   if (!cvs) return null;
   const boxRect = cvs.getBoundingClientRect();
-  const ratio = dpr.value || 1;
+  const ratio = getDevicePixelRatio();
   const ex = (e.clientX - boxRect.left) * ratio;
   const ey = (e.clientY - boxRect.top) * ratio;
   const contentW = out.w * lastDraw.scale;
@@ -451,128 +553,92 @@ const OnPointerMove = (e: PointerEvent) => {
   } else if (drag.mode === 'resize' && drag.handle) {
     // 固定比例，支援角與邊把手
     const asp = cropAspect.value;
-    const outW = lastDraw.outW, outH = lastDraw.outH;
-    // 目前值
-    const w = drag.init.w, h = drag.init.h, x = drag.init.x, y = drag.init.y;
-    // 計算新 w/h 與 x/y
-    let newW = w, newH = h, newX = x, newY = y;
+    const outSize = { w: lastDraw.outW, h: lastDraw.outH };
+    const initRect = { x: drag.init.x, y: drag.init.y, w: drag.init.w, h: drag.init.h };
+    let nextRect: typeof initRect = { ...initRect };
+    let handledByCorner = false;
 
-    // 以像素比例換算：確保 (w*outW)/(h*outH)=asp
-    const WtoH = (wn: number) => (wn * outW) / (asp * outH);
-    const HtoW = (hn: number) => (hn * asp * outH) / outW;
-    const clampW = (val: number) => Math.max(cfg.value.cropMinW, Math.min(val, cfg.value.cropMaxW));
-
-    if (['nw','ne','sw','se'].includes(drag.handle)) {
-      const signX = (drag.handle === 'ne' || drag.handle === 'se') ? 1 : -1;
-      const signY = (drag.handle === 'sw' || drag.handle === 'se') ? 1 : -1;
-      let delta = Math.max(Math.abs(dx), Math.abs(dy));
-      delta *= (Math.abs(dx) >= Math.abs(dy) ? Math.sign(dx) * signX : Math.sign(dy) * signY);
-      newW = clampW(w + delta);
-      newH = WtoH(newW);
-      if (drag.handle === 'nw' || drag.handle === 'sw') newX = x + (w - newW);
-      if (drag.handle === 'nw' || drag.handle === 'ne') newY = y + (h - newH);
-    } else if (drag.handle === 'e') {
-      // 右邊為錨：以中心Y容量與右側水平容量共同限制寬度
-      const cy = y + h / 2; // 以初始中心為基準
-      const HcapY = Math.min(1, 2 * Math.min(cy, 1 - cy));
-      const WcapY = HcapY * (asp * outH) / outW; // 由比例換算成寬度容量
-      const WcapX = 1 - x; // 右側水平容量
-      const desiredW = clampW(w + dx);
-      const cappedW = Math.max(cfg.value.cropMinW, Math.min(desiredW, WcapX, WcapY, cfg.value.cropMaxW));
-      const cappedH = WtoH(cappedW);
-      const centeredY = cy - cappedH / 2;
-      newW = cappedW;
-      newH = cappedH;
-      newX = x; // 固定左邊
-      newY = Math.min(Math.max(0, centeredY), 1 - cappedH); // 只調整位置，保持寬高
-    } else if (drag.handle === 'w') {
-      // 左邊為錨：以中心Y容量與左側水平容量共同限制寬度
-      const cy = y + h / 2;
-      const HcapY = Math.min(1, 2 * Math.min(cy, 1 - cy));
-      const WcapY = HcapY * (asp * outH) / outW;
-      const WcapX = x + w; // 左側水平容量（含目前寬度）
-      const desiredW = clampW(w - dx);
-      const cappedW = Math.max(cfg.value.cropMinW, Math.min(desiredW, WcapX, WcapY, cfg.value.cropMaxW));
-      const cappedH = WtoH(cappedW);
-      const candX = x + (w - cappedW); // 固定右邊
-      const centeredY = y + (h - cappedH) / 2;
-      newW = cappedW;
-      newH = cappedH;
-      newX = candX;
-      newY = Math.min(Math.max(0, centeredY), 1 - cappedH);
-    } else if (drag.handle === 's') {
-      const candidateH = h + dy;
-      newW = clampW(HtoW(candidateH));
-      newH = WtoH(newW);
-      newY = y; // 固定上邊
-      newX = x + (w - newW) / 2;
-    } else if (drag.handle === 'n') {
-      const candidateH = h - dy;
-      newW = clampW(HtoW(candidateH));
-      newH = WtoH(newW);
-      newY = y + (h - newH); // 固定下邊
-      newX = x + (w - newW) / 2;
-    }
-
-    // （移除 e/w 的預先夾緊，改由下方單一路徑完整處理）
-    if (drag.handle === 'ne' || drag.handle === 'nw') {
-      // 以頂邊為錨：若超出上界，調整高度並依比例回推寬度，保持頂邊貼齊 0
-      if (newY < 0) {
-        const overflow = -newY;
-        let candH = newH - overflow;
-        candH = Math.max(candH, cfg.value.cropMinW);
-        newH = candH;
-        newW = HtoW(newH);
-        newY = 0;
-        if (drag.handle === 'nw') newX = x + (w - newW); else newX = x; // 左/右頂角分別維持其對應邊
-      }
-    }
-    if (drag.handle === 'w' || drag.handle === 'nw' || drag.handle === 'sw') {
-      // 以左邊為錨：若左側超界，調整寬度，保持左邊貼齊 0
-      if (newX < 0) {
-        const overflow = -newX;
-        let candW = newW - overflow;
-        candW = Math.max(candW, cfg.value.cropMinW);
-        newW = candW;
-        newH = WtoH(newW);
-        newX = 0;
-        // 依錨點重置 Y（僅角把手時才需要保持對齊）
-        if (drag.handle === 'nw') newY = y + (h - newH);
-        else if (drag.handle === 'sw') newY = y;
+    if (isCornerHandle(drag.handle)) {
+      const cornerResult = computeCornerResize({
+        handle: drag.handle,
+        pointerPx: { x: p.x, y: p.y },
+        initRect,
+        outSize,
+        aspect: asp,
+        config: cfg.value,
+      });
+      if (cornerResult) {
+        nextRect = cornerResult;
+        handledByCorner = true;
       }
     }
 
-    // 維持比例且不越界：一般情況以右/下為限制做一次比例回縮（角把手適用）
-    if (['nw','ne','sw','se','n','s'].includes(drag.handle)) {
-      const maxW = 1 - newX;
-      const maxH = 1 - newY;
-      if (newW > maxW || newH > maxH) {
-        const s = Math.min(maxW / newW, maxH / newH, 1);
-        const adjW = newW * s;
-        const adjH = newH * s;
-        if (drag.handle === 'nw' || drag.handle === 'sw') newX = x + (w - adjW);
-        if (drag.handle === 'nw' || drag.handle === 'ne') newY = y + (h - adjH);
-        newW = adjW; newH = adjH;
+    if (!handledByCorner) {
+      const WtoH = (wn: number) => (wn * outSize.w) / (asp * outSize.h);
+      const HtoW = (hn: number) => (hn * asp * outSize.h) / outSize.w;
+      const clampW = (val: number) => Math.max(cfg.value.cropMinW, Math.min(val, cfg.value.cropMaxW));
+
+      if (drag.handle === 'e') {
+        // 右邊為錨：以中心Y容量與右側水平容量共同限制寬度
+        const cy = initRect.y + initRect.h / 2;
+        const HcapY = Math.min(1, 2 * Math.min(cy, 1 - cy));
+        const WcapY = (HcapY * asp * outSize.h) / outSize.w;
+        const WcapX = 1 - initRect.x;
+        const desiredW = clampW(initRect.w + dx);
+        const cappedW = Math.max(cfg.value.cropMinW, Math.min(desiredW, WcapX, WcapY, cfg.value.cropMaxW));
+        const cappedH = WtoH(cappedW);
+        const centeredY = cy - cappedH / 2;
+        nextRect.w = cappedW;
+        nextRect.h = cappedH;
+        nextRect.x = initRect.x;
+        nextRect.y = Math.min(Math.max(0, centeredY), 1 - cappedH);
+      } else if (drag.handle === 'w') {
+        // 左邊為錨：以中心Y容量與左側水平容量共同限制寬度
+        const cy = initRect.y + initRect.h / 2;
+        const HcapY = Math.min(1, 2 * Math.min(cy, 1 - cy));
+        const WcapY = (HcapY * asp * outSize.h) / outSize.w;
+        const WcapX = initRect.x + initRect.w;
+        const desiredW = clampW(initRect.w - dx);
+        const cappedW = Math.max(cfg.value.cropMinW, Math.min(desiredW, WcapX, WcapY, cfg.value.cropMaxW));
+        const cappedH = WtoH(cappedW);
+        const candX = initRect.x + (initRect.w - cappedW);
+        const centeredY = initRect.y + (initRect.h - cappedH) / 2;
+        nextRect.w = cappedW;
+        nextRect.h = cappedH;
+        nextRect.x = candX;
+        nextRect.y = Math.min(Math.max(0, centeredY), 1 - cappedH);
+      } else if (drag.handle === 's') {
+        const candidateH = initRect.h + dy;
+        nextRect.w = clampW(HtoW(candidateH));
+        nextRect.h = WtoH(nextRect.w);
+        nextRect.y = initRect.y;
+        nextRect.x = initRect.x + (initRect.w - nextRect.w) / 2;
+      } else if (drag.handle === 'n') {
+        const candidateH = initRect.h - dy;
+        nextRect.w = clampW(HtoW(candidateH));
+        nextRect.h = WtoH(nextRect.w);
+        nextRect.y = initRect.y + (initRect.h - nextRect.h);
+        nextRect.x = initRect.x + (initRect.w - nextRect.w) / 2;
       }
     }
 
-    // 吸附（像素到 out 空間正規化）
-    const snapX = (cfg.value.snapPx * (dpr.value || 1)) / (lastDraw.scale * outW);
-    const snapY = (cfg.value.snapPx * (dpr.value || 1)) / (lastDraw.scale * outH);
-    // 左/上邊
-    if (Math.abs(newX - 0) < snapX) newX = 0;
-    if (Math.abs(newY - 0) < snapY) newY = 0;
-    // 右/下邊
-    if (Math.abs((newX + newW) - 1) < snapX) newX = 1 - newW;
-    if (Math.abs((newY + newH) - 1) < snapY) newY = 1 - newH;
+    const ratio = getDevicePixelRatio();
+    const snapX = (cfg.value.snapPx * ratio) / (lastDraw.scale * outSize.w);
+    const snapY = (cfg.value.snapPx * ratio) / (lastDraw.scale * outSize.h);
+    if (Math.abs(nextRect.x - 0) < snapX) nextRect.x = 0;
+    if (Math.abs(nextRect.y - 0) < snapY) nextRect.y = 0;
+    if (Math.abs((nextRect.x + nextRect.w) - 1) < snapX) nextRect.x = 1 - nextRect.w;
+    if (Math.abs((nextRect.y + nextRect.h) - 1) < snapY) nextRect.y = 1 - nextRect.h;
 
-    // 最終嚴格邊界限制，避免貼齊後再度越界（特別是上邊界）
-    newX = Math.min(Math.max(0, newX), 1 - newW);
-    newY = Math.min(Math.max(0, newY), 1 - newH);
-    newW = Math.min(newW, 1 - newX);
-    newH = Math.min(newH, 1 - newY);
+    nextRect.x = Math.min(Math.max(0, nextRect.x), 1 - nextRect.w);
+    nextRect.y = Math.min(Math.max(0, nextRect.y), 1 - nextRect.h);
+    nextRect.w = Math.min(nextRect.w, 1 - nextRect.x);
+    nextRect.h = Math.min(nextRect.h, 1 - nextRect.y);
 
-    cropRect.x = newX; cropRect.y = newY; cropRect.w = newW; cropRect.h = newH;
+    cropRect.x = nextRect.x;
+    cropRect.y = nextRect.y;
+    cropRect.w = nextRect.w;
+    cropRect.h = nextRect.h;
     DrawPreview();
   }
 };
@@ -587,7 +653,7 @@ const OnPointerUp = (e: PointerEvent) => {
 
 // 匯出：以原始像素維度（含旋轉後寬高）渲染至離屏 canvas，避免失真
 const ExportImage = async () => {
-  if (!imgBitmap.value || !srcFile.value) {
+  if (!hasImage.value || !srcFile.value) {
     ElMessage.warning('請先選擇圖片');
     return;
   }
@@ -603,11 +669,8 @@ const ExportImage = async () => {
 
   ctx.save();
   ctx.translate(off.width / 2, off.height / 2);
-  const sx = transform.flipX ? -1 : 1;
-  const sy = transform.flipY ? -1 : 1;
   // 先旋轉再鏡像，避免鏡像導致旋轉方向顛倒
-  ctx.rotate((transform.angle * Math.PI) / 180);
-  ctx.scale(sx, sy);
+  ApplyImageTransform(ctx, transform.angle, transform.flipX, transform.flipY);
   ctx.drawImage(img, -natural.w / 2, -natural.h / 2, natural.w, natural.h);
   ctx.restore();
 
