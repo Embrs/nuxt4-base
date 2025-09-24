@@ -22,10 +22,10 @@ const ApiDemo = async() => {
     p PageIndex
   NuxtLink(to="/sample/sign-in")
     ElButton Sign In
-  ElButton(@click="() => storeTheme.ChangeTheme('dark')") dark;
-  ElButton(@click="() => storeTheme.ChangeTheme('light')") light;
-  ElButton(@click="() => $mitt.EmitRefresh()") EmitRefresh;
-  ElButton(@click="ApiDemo") ApiDemo;
+  ElButton(@click="() => storeTheme.ChangeTheme('dark')") dark
+  ElButton(@click="() => storeTheme.ChangeTheme('light')") light
+  ElButton(@click="() => $mitt.EmitRefresh()") EmitRefresh
+  ElButton(@click="ApiDemo") ApiDemo
   .row-item
     SwitchLocalePathLink(
       v-for="localeItem in locales" :key="localeItem.code" :locale="localeItem.code"
