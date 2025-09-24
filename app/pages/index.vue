@@ -22,6 +22,8 @@ const ApiDemo = async() => {
     p PageIndex
   NuxtLink(to="/sample/sign-in")
     ElButton Sign In
+  NuxtLink(to="/sample/bluetooth-demo")
+    ElButton Bluetooth Demo
   ElButton(@click="() => storeTheme.ChangeTheme('dark')") dark
   ElButton(@click="() => storeTheme.ChangeTheme('light')") light
   ElButton(@click="() => $mitt.EmitRefresh()") EmitRefresh
