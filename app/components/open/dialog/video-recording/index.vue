@@ -440,7 +440,7 @@ ElDialogPlus.OpenDialogVideoRecording(
   cursor: pointer;
   background: #e5e7eb; // gray-200
   color: #111827; // gray-900
-  &.record { background: $primary; color: #fff; } // red-500
+  &.record { background: $err; color: #fff; } // red-500
   &.roteate { 
     @include wh(48px);
     @include center;
@@ -448,7 +448,7 @@ ElDialogPlus.OpenDialogVideoRecording(
     background: #9ca3af; 
     color: #fff;
    } // gray-400
-  &.primary { background: #6A574E; color: #fff; } // emerald-500
+  &.primary { background: $primary; color: #fff; } // emerald-500
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 

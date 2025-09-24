@@ -11,3 +11,21 @@ export const SignIn = () => {
   };
   return mockRes.CreateRes(data);
 };
+
+// -------------------------------------------------------------------------------------------------
+// 忘記密碼
+export const ForgotPassword = () => {
+  const data: ForgotPasswordRes = {
+    success: true
+  };
+  return mockRes.CreateRes(data);
+};
+
+// -------------------------------------------------------------------------------------------------
+// 註冊
+export const SignUp = () => {
+  const data: SignUpRes = {
+    success: true
+  };
+  return mockRes.CreateRes(data);
+};
