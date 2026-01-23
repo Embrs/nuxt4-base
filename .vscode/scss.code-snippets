@@ -1,0 +1,213 @@
+{
+
+  "RWD 快捷": {
+		"prefix": "rwd",
+		"body": [
+			"@include rwd-pc {",
+			"  $1",
+			"}",
+      "@include rwd-mobile {",
+      "  $2",
+      "}",
+		],
+		"description": "RWD"
+	},
+
+  "RWD 隱藏": {
+    "prefix": "rwds",
+		"body": [
+	    ".pc-show {",
+      "  @include rwd-mobile {",
+      "    display: none;",
+      "  }",
+      "}",
+      ".mobile-show {",
+      "  @include rwd-pc {",
+      "    display: none;",
+      "  }",
+      "}",
+		],
+		"description": "RWD Show"
+  },
+
+  "Console log 快捷": {
+    "prefix": "ll",
+    "body": [
+      "console.log($1);",
+    ]
+  },
+ 
+  "vue 檔模板": {
+    "prefix": "tt",
+    "body": [
+      "<script setup lang=\"ts\">",
+      "// $1 請填寫功能描述👈",
+      "</script>",
+      "",
+      "<template lang=\"pug\">",
+      ".$1",
+      "  p $1",
+      "</template>",
+      "",
+      "<style lang=\"scss\" scoped>",
+      "// 佈局 ----",
+      ".$1 {",
+      "  // TODO",
+      "}",
+      "",
+      "// 組件 ----",
+      "</style>",
+      ""
+    ]
+  },
+  "scss 檔模板": {
+    "prefix": "scss",
+    "body": [
+      "<style lang=\"scss\" scoped>",
+      "// 佈局 ----",
+      ".$1 {",
+      "  // TODO",
+      "}",
+      "",
+      "// 組件 ----",
+      "</style>",
+      ""
+    ]
+  },
+  "mark line": {
+    "prefix": "// -",
+    "body": [
+      "// $1-----------------------------------------------------------------------------------------------",
+    ]
+  },
+
+  "mark text": {
+    "prefix": "/",
+    "body": [
+      "/** $1 */",
+    ]
+  },
+  
+  "classify 分類": {
+		"prefix": "mClassify",
+		"body": [
+      "// -- 引入 --------------------------------------------------------------------------------------------",
+      "// * import {} from '';",
+      "// * const storeSelf = useSelfStore();",
+      "",
+      "// -- 資料 --------------------------------------------------------------------------------------------",
+      "// * type Props = {}",
+			"// * const props = withDefaults(defineProps<Props>(),{});",
+      "// * const elForm = useTemplateRef('elForm');",
+      "",
+      "// -- 接收事件 -----------------------------------------------------------------------------------------",
+      "// * watch(()=>,()=>{},{deep: true, immediate: true})",
+      "// * const OnClick = () => {}",
+      "",
+      "// -- 流程 --------------------------------------------------------------------------------------------",
+      "// * const InitFlow = () => {}",
+      "",
+      "// -- 函式 --------------------------------------------------------------------------------------------",
+      "",
+      "// -- Api ---------------------------------------------------------------------------------------------",
+      "",
+      "// -- 生命週期 -----------------------------------------------------------------------------------------",
+			"// * onMounted(() => {}); ",
+      "// * onBeforeUnmount(() => {});",
+      "",
+      "// -- 發送事件 -----------------------------------------------------------------------------------------", 
+      "// * type Emit = { 'on-change': [id: number, value: any] }",
+			"// * const emit = defineEmits<Emit>();",
+      "",
+			"// -- 對外暴露 -----------------------------------------------------------------------------------------",
+			"// * defineExpose({ ... });",
+		]
+	},
+  "apibase": {
+    "prefix": "api",
+    "body": [
+      "/** 說明API */",
+      "const Api$1 = async () => {",
+      "  const res = await \\$api.$1();",
+      "  if (res.status.code === 0) {",
+      "    // TODO",
+      "    return true;",
+      "  }",
+      "  return false;",
+      "};",
+    ]
+  },
+  "api 資料型別": {
+    "prefix": "api-type",
+    "body": [
+      "// $1 -----------------------------------------------------------------------------------------------",
+      "/** $1 參數 */",
+      "type $2Params = {",
+      "",
+      "}",
+      "",
+      "/** $1 回傳 */",
+      "type $2Res = {",
+      "",  
+      "}",
+      "type $2Res = Omit<",
+      "  對象,",
+      "  | '排除節點1'",
+      "  | '排除節點2'",
+      ">",
+      ""
+    ]
+  },
+
+  "useAsnycData": {
+    "prefix": "useAsyncData",
+		"body": [
+			"useAsyncData('$1-init', async () => {",
+      "  $2",
+      "  await Promise.all([fn1(), fn2()]);",
+      "  return true;",
+      "});"
+		]
+  },
+  
+  "debounce 基礎": {
+		"prefix": "debounce",
+		"body": [
+			"\\$lodash.debounce(() => {",
+			"  // ",
+			"}, 1000, { leading: true, trailing: false });"
+		]
+	},
+  "ts 單行關閉檢測": {
+    "prefix": "ts-ignore",
+    "body": [
+      "// @ts-ignore"
+    ]
+  },
+  "flow 流程基底": {
+    "prefix": "flow",
+    "body": [
+      "const $1Flow = () => {",
+      "  try {",
+      "    // if () {",
+      "    //   throw new Error('Error');",
+      "    // }",
+      "    // return true;",
+      "  } catch (error) {",
+      "    // console.error('error', error);",
+      "    // return false;",
+      "  } finally {",
+      "    // TODO",
+      "  }",
+      "};"
+    ]
+  },
+  "pinia store": {
+    "prefix": "store",
+    "body": [
+      "export const Store$1 = defineStore('Store$1', () => {",
+      "  return {};",
+      "});"
+    ]
+  }
+}
