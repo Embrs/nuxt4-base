@@ -30,7 +30,7 @@
 ├── shared/                 # 共用類型
 │   └── types/              # TypeScript 類型定義
 │
-├── .agent/                 # AI Agent 配置
+├── .windsurf/                 # AI Agent 配置
 │   ├── skills/             # Agent Skills
 │   └── workflows/          # 工作流程
 │
@@ -72,5 +72,5 @@
 
 執行 `scripts/sync-check.sh` 可查看實際數量統計：
 ```bash
-bash .agent/skills/project-knowledge/scripts/sync-check.sh
+bash .windsurf/skills/project-knowledge/scripts/sync-check.sh
 ```

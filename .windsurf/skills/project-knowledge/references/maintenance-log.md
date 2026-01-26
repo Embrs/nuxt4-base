@@ -11,7 +11,7 @@
 - **[新增]** `references/maintenance-log.md` - 維護日誌
 - **[歸檔]** `enhance-project-knowledge-skill` - 增強專案知識庫自主運行機制
 - **[歸檔]** `create-agent-skills-system` - 建立 Agent Skills 系統（包含 8 個基礎 Skills）
-- **[重構]** `.agent/skills/*` - 全面移除專案特定內容（享睡寶、硬編碼帳號）
+- **[重構]** `.windsurf/skills/*` - 全面移除專案特定內容（享睡寶、硬編碼帳號）
 - **[更新]** `items/tech-decisions.md` - 加入 Agent 系統決策
 - **[更新]** `nuxt.config.ts` - 恢復預設端口 3000
 
