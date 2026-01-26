@@ -31,8 +31,21 @@
 │   └── types/              # TypeScript 類型定義
 │
 ├── .windsurf/                 # AI Agent 配置
-│   ├── skills/             # Agent Skills
+│   ├── skills/             # Agent Skills（9個專業技能）
+│   │   ├── debugging/       # 調試技能
+│   │   ├── deployment/      # 部署技能
+│   │   ├── element-plus-ui/ # Element Plus UI 技能
+│   │   ├── nuxt-backend/    # Nuxt 後端開發技能
+│   │   ├── nuxt-frontend/   # Nuxt 前端開發技能
+│   │   ├── prisma-database/ # Prisma 資料庫技能
+│   │   ├── project-knowledge/ # 專案知識庫技能
+│   │   ├── testing/         # 測試驗證技能
+│   │   └── user-feedback/   # 用戶回饋技能
 │   └── workflows/          # 工作流程
+│       ├── git-commit.md   # Git 提交流程
+│       ├── mcp-test.md     # MCP 測試流程
+│       ├── project-init.md # 專案初始化流程
+│       └── user-feedback.md # 用戶回饋收集流程
 │
 └── .memory/                # AI 記憶庫
     ├── archive/            # 歷史歸檔
