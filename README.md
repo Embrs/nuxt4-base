@@ -128,6 +128,11 @@ yarn install
 # bun
 bun install
 ```
+### Nuxt upgrade
+
+```bash
+npx nuxt upgrade --dedupe
+```
 
 ### 開發伺服器
 
