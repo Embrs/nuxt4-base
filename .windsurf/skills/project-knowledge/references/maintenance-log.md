@@ -4,6 +4,11 @@
 
 ## 2026-02
 
+### 2026-02-24
+- **[更新]** `items/tech-decisions.md` - 新增安全與依賴決策區塊，記錄 ESLint 10 升級
+- **[更新]** `package.json` - 升級 ESLint 到 v10，新增 minimatch overrides
+- **[修復]** npm 安全漏洞 - 從 30 個漏洞降至 0 個（ajv、devalue、minimatch、tar、nanotar）
+
 ### 2026-02-12
 - **[更新]** `items/tech-decisions.md` - 標記 Nuxt 4 正式版遷移完成 (v4.3.1)
 - **[更新]** `README.md` - 新增 Nuxt upgrade 指令說明

@@ -33,7 +33,7 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.18",
     "element-plus": "^2.13.0",
-    "eslint": "^9.35.0",
+    "eslint": "^10.0.0",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.1",
     "pinia": "^3.0.3",
@@ -41,7 +41,8 @@
     "sass": "^1.92.1"
   },
   "overrides": {
-    "glob": "^11.0.4"
+    "glob": "^11.0.4",
+    "minimatch": "^10.2.1"
   },
   "engines": {
     "node": ">= 24.13.0"
