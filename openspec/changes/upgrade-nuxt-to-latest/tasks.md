@@ -127,7 +127,7 @@
 - [x] 7.3 執行最終一次 `npm run lint` + `npm run build`，確認一切乾淨 *(lint 仍是基線 2 個既有錯誤無新增；build 成功 5.11 MB / 1.43 MB gzip)*
 - [x] 7.4 整理本次升級的最終版本表（核心 + 模組 + 第三方），寫入本檔的「最終版本記錄」區塊
 - [x] 7.5 通過 OpenSpec 驗證：執行 `openspec validate upgrade-nuxt-to-latest --strict` *(`Change 'upgrade-nuxt-to-latest' is valid`)*
-- [ ] 7.6 準備 commit 訊息草稿給使用者確認後再 commit 收尾，並提示使用者執行 `/opsx:archive` 歸檔此 change *(待使用者確認)*
+- [x] 7.6 準備 commit 訊息草稿給使用者確認後再 commit 收尾，並提示使用者執行 `/opsx:archive` 歸檔此 change *(已 commit f00d0f8 — 使用者選擇合併成 1 個 commit)*
 
 ## 8. 不適用項目（明確記錄）
 
