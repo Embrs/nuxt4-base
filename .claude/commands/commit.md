@@ -20,7 +20,15 @@ git status
 git diff
 ```
 
-### Step 2: 知識庫更新檢查
+### Step 2: 版本號累加
+
+讀取 `version.ts`，將語意化版本（`MAJOR.MINOR.PATCH`）的 **PATCH**（最小版本號）+1 後寫回。
+
+- 範例：`0.0.1` → `0.0.2`
+- 僅累加 patch，不動 major/minor
+- 此步驟必須在 `git add` 之前完成，確保版本變更一併納入本次 commit
+
+### Step 3: 知識庫更新檢查
 
 根據 `git diff` 的變更內容分析是否需要更新知識庫：
 
@@ -47,19 +55,19 @@ git diff
 3. 根據這些 commit 的變更內容，整理需要反映到 `CLAUDE.md` 的更新（如新增模組、結構變更、技術棧調整等）
 4. 更新完成後，將末尾的「最後更新時間」更新為今天日期
 
-### Step 3: 暫存所有變更
+### Step 4: 暫存所有變更
 
 ```bash
 git add .
 ```
 
-### Step 4: 檢視變更
+### Step 5: 檢視變更
 
 ```bash
 git diff --staged --stat
 ```
 
-### Step 5: 生成 Commit 訊息
+### Step 6: 生成 Commit 訊息
 
 根據 `git diff --staged` 生成 Conventional Commits 訊息：
 
@@ -81,7 +89,7 @@ git diff --staged --stat
 
 **語言**：繁體中文
 
-### Step 6: 執行提交
+### Step 7: 執行提交
 
 ```bash
 git commit -m "你的提交訊息"

@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 所有對話、回覆、註解說明一律使用**繁體中文**
 - 程式碼中的變數名稱、函式名稱維持英文
 - Git commit message 使用繁體中文，遵循 Conventional Commits 格式（`feat:`, `fix:`, `docs:`, `refactor:`, `style:`, `chore:`）
+  - 範例：`feat: 新增使用者列表分頁`、`fix: 修正登入後 Token 未更新問題`
 
 ## 常用指令
 
@@ -18,7 +19,9 @@ npm run lint         # ESLint 檢查
 npm run lint:fix     # ESLint 自動修復
 ```
 
-環境需求：Node.js >= 24.13.0
+- 環境需求：Node.js >= 24.13.0
+- 本專案**未配置測試框架**，無 `npm test`
+- `npm run dev` 會載入 `.env.dev`；新環境需先自行建立該檔
 
 ## 專案架構
 
@@ -30,7 +33,8 @@ npm run lint:fix     # ESLint 自動修復
 - `server/` — Nitro 伺服器端（API 路由使用 `@@` 別名）
 - `i18n/locales/` — 多語系翻譯檔（zh、en、ja）
 - `types/` — 全局 TypeScript 型別定義
-- `openspec/` — OpenSpec 規格系統
+- `shared/` — 前後端共享程式碼（以 `~shared` 別名引用）
+- `openspec/` — OpenSpec 規格系統，新增功能或重構時透過 openspec skill 建立變更提案
 
 ### 路徑別名
 
@@ -159,3 +163,14 @@ if (res.status.code !== $enum.apiStatus.success) return false;
 ## 多語系
 
 三語系支援（繁中 zh、英文 en、日文 ja），預設繁中。路由策略 `prefix_except_default`（預設語言不加 URL 前綴）。翻譯檔位於 `i18n/locales/`。
+
+## 知識庫
+
+詳細規範與技術知識存放於 `.claude/knowledge/`，按需讀取以減少上下文消耗：
+
+| 文件 | 內容 | 建議閱讀時機 |
+|------|------|-------------|
+| [frontend-conventions.md](.claude/knowledge/frontend-conventions.md) | SFC 結構、命名慣例、SCSS BEM、Element Plus 限制、自動導入、彈窗系統 | 撰寫或修改 Vue 組件、頁面、SCSS 樣式時 |
+| [backend-conventions.md](.claude/knowledge/backend-conventions.md) | API 路由結構、錯誤處理（`return` 非 `throw`）、統一響應格式、三語言錯誤訊息 | 撰寫 `server/routes/nuxt-api/*` 端點時 |
+
+> 最後更新時間：2026-04-09
