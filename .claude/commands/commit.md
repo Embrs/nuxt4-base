@@ -1,81 +1,67 @@
 ---
-name: "Git Commit"
-description: Git 提交 + 知識庫維護
+name: "Commit"
+description: Git 提交流程 + 知識庫維護
+category: Workflow
+tags: [workflow, git, knowledge]
 ---
 
 # Git 提交流程
 
-> 提交變更並維護 Agent Skills 知識庫（`.claude/skills/project-knowledge/`）。
-
----
-
-## 職責分離
-
-| 內容 | 本 Workflow 是否更新 |
-|------|---------------------|
-| 專案知識庫 | 若有架構/模組變更 |
-| 業務規則 | 若有業務邏輯變更 |
-| 維護日誌 | 記錄重要變更 |
+> 提交變更並維護專案知識庫（`CLAUDE.md` + `.claude/knowledge/`）。
 
 ---
 
 ## 執行步驟
 
-### Step 1: 檢查狀態
-1. 檢查當前狀態：
-   ```bash
-   git status
-   ```
+### Step 1: 檢查狀態與變更內容
 
-### Step 2: 暫存變更
-2. 加入所有變更：
-   ```bash
-   git add .
-   ```
+```bash
+git status
+git diff
+```
 
-### Step 3: 檢視變更
-3. 檢視變更內容：
-   ```bash
-   git diff --staged --stat
-   ```
+### Step 2: 知識庫更新檢查
 
-### Step 4: 分析變更類型
+根據 `git diff` 的變更內容分析是否需要更新知識庫：
 
-4. 根據變更檔案分析是否需要更新知識庫：
+#### 觸發條件
 
-#### 架構相關變更 → 更新 `.claude/skills/project-knowledge/items/`
+| 變更類型 | 更新目標 | 動作 |
+|----------|----------|------|
+| 新增功能模組 | `.claude/knowledge/modules.md` | 添加模組描述 |
+| 目錄結構變更 | `CLAUDE.md` 架構總覽 | 更新結構描述 |
+| 技術棧/依賴升級 | `.claude/knowledge/tech-decisions.md` | 記錄決策 |
+| 重大架構決策 | `.claude/knowledge/tech-decisions.md` | 記錄決策與原因 |
+| 新的業務流程 | `.claude/knowledge/` 新增文件 | 新增業務規則文件 |
+| 業務邏輯變更 | `.claude/knowledge/` 對應文件 | 更新規則 |
+| 新增知識文件 | `CLAUDE.md` 知識庫索引 | 同步更新索引表格 |
 
-| 變更類型 | 更新目標 |
-|----------|----------|
-| 新增模組/目錄 | `items/modules.md` |
-| 目錄結構變更 | `items/architecture.md` |
-| 技術棧/依賴升級 | `items/tech-decisions.md` |
-| 重大架構決策 | `items/tech-decisions.md` |
+若需更新，立即執行對應更新。
 
-#### 業務規則變更 → 更新 `.memory/context/`
+#### CLAUDE.md 差異比對更新
 
-| 變更類型 | 更新目標 |
-|----------|----------|
-| 新的業務流程 | `.memory/context/` 新增文件 |
-| 業務邏輯變更 | 對應業務規則文件 |
+每次更新 `CLAUDE.md` 時，執行以下流程：
 
-5. 若需更新，執行對應更新並記錄到維護日誌
+1. 讀取 `CLAUDE.md` 末尾的「最後更新時間」
+2. 使用 `git log --since="<最後更新時間>" --oneline` 查看自上次更新以來的所有 commit
+3. 根據這些 commit 的變更內容，整理需要反映到 `CLAUDE.md` 的更新（如新增模組、結構變更、技術棧調整等）
+4. 更新完成後，將末尾的「最後更新時間」更新為今天日期
 
-### Step 5: 更新維護日誌（若有知識庫變更）
-6. 若有更新知識庫，記錄到：
-   ```
-   .claude/skills/project-knowledge/references/maintenance-log.md
-   ```
+### Step 3: 暫存所有變更
 
-   格式：
-   ```markdown
-   ### YYYY-MM-DD
-   - **[類型]** `影響文件` - 變更描述
-   ```
+```bash
+git add .
+```
 
-### Step 6: 生成 Commit 訊息
+### Step 4: 檢視變更
 
-7. 根據 `git diff --staged` 生成 Conventional Commits 訊息：
+```bash
+git diff --staged --stat
+```
+
+### Step 5: 生成 Commit 訊息
+
+根據 `git diff --staged` 生成 Conventional Commits 訊息：
 
 **格式**：
 ```
@@ -95,39 +81,24 @@ description: Git 提交 + 知識庫維護
 
 **語言**：繁體中文
 
-### Step 7: 執行提交
+### Step 6: 執行提交
+
 ```bash
 git commit -m "你的提交訊息"
 ```
 
 ---
 
-## 知識庫更新提醒
-
-### 觸發條件
-
-| 觸發條件 | 更新位置 | 動作 |
-|----------|----------|------|
-| 新增功能模組 | `items/modules.md` | 添加模組描述 |
-| 新增業務規則 | `.memory/context/` | 新增規則文件 |
-| 資料庫 Schema 變更 | `items/architecture.md` | 更新資料模型 |
-| 技術決策變更 | `items/tech-decisions.md` | 記錄決策 |
-| OpenSpec 歸檔 | `references/maintenance-log.md` | 記錄維護 |
-
-### 內容歸屬判定
+## 內容歸屬判定
 
 ```
-問：這個內容放哪裡？
+問：這個知識放哪裡？
 
-├─ 可跨專案複用？
-│  ├─ YES → .claude/skills/
-│  └─ NO → 繼續判斷
-│
-├─ 是業務規則/流程？
-│  ├─ YES → .memory/context/
-│  └─ NO → 繼續判斷
-│
-├─ 是歷史記錄/歸檔？
-│  ├─ YES → .memory/archive/
-│  └─ NO → 可能不需要記錄
+├─ 是核心架構/開發指令/技術棧？  → CLAUDE.md（直接寫入）
+├─ 是開發慣例/入口點？           → CLAUDE.md 開發入口慣例區塊
+├─ 是業務規則/領域知識？         → .claude/knowledge/{描述性名稱}.md
+├─ 是技術決策？                  → .claude/knowledge/tech-decisions.md
+├─ 是功能模組描述？              → .claude/knowledge/modules.md
+├─ 可跨專案複用？                → .claude/skills/
+└─ 以上皆非？                    → 可能不需要記錄
 ```
