@@ -78,9 +78,22 @@ $lodash.pick(obj, ['name', 'email'])
 $lodash.omit(obj, ['password'])
 ```
 
-## $encrypt / $open / $api
+## $encrypt - 加密 / 解密
 
-- `$encrypt`：加密 / 解密輔助（見 `app/utils/$encrypt.ts`）
+```typescript
+// Base64 編 / 解碼（UTF-8 安全版，會先 encodeURIComponent 處理多位元字元）
+$encrypt.Encode64('中文字串')            // 回傳 Base64 字串；失敗回 ''
+$encrypt.Decode64(base64Str)             // 回傳原文；失敗回 ''
+
+// AES 加 / 解密（使用檔內固定 SECRET_KEY）
+$encrypt.EncodeAES('plain text')         // 回傳 AES 密文
+$encrypt.DecodeAES(cipherText)           // 回傳原文
+```
+
+> ⚠️ `EncodeAES` / `DecodeAES` 使用 `app/utils/$encrypt.ts` 內硬編碼的 `SECRET_KEY`，不適用於需要保密的場景，僅可用於前端本地混淆（例如 cookie 儲存）。真正機密資料請在後端處理。
+
+## $open / $api
+
 - `$open`：業務彈窗開啟器（見 [drawer-system.md](drawer-system.md)）
 - `$api`：後端請求封裝（見 [api-usage.md](api-usage.md)）
 

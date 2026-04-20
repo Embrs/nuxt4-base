@@ -6,9 +6,11 @@ const HasKey = (object: unknown, key: PropertyKey): boolean => object != null &&
 /** 是 array */
 const IsArray = Array.isArray;
 
-/** 是單純物件 */
+/** 是單純物件（排除 Array、Date、Map、Set、Blob 等特殊物件） */
 const _IsPlainObject = (value: unknown): value is Record<string, any> => {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
+  if (value === null || typeof value !== 'object') return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === null || proto === Object.prototype;
 };
 
 /** 是 object */
@@ -17,9 +19,11 @@ const IsObject = (value: unknown): value is Record<string, any> => _IsPlainObjec
 // 生成轉換 ----------------------------------------------------------------------------------------------------
 /** UUID 生成 */
 const CreateUUID = (): string => {
-  // 需要在安全環境下才能使用
-  if (crypto.randomUUID) return crypto.randomUUID();
-  // 非安全環境下使用
+  // 安全環境（HTTPS/localhost）下使用原生 API
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // 非安全環境或 SSR 環境下的 fallback
   let d = Date.now();
   if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
     d += performance.now(); // use high-precision timer if available
@@ -46,16 +50,19 @@ const MoneyToNum = (value: string): number => {
 
 /* array Object 節點深度空字元過濾器 */
 const ArrayObjectFilter = <T>(data: T, removeValue: unknown[] = [null, undefined, '']): T => {
+  const shouldRemove = (value: unknown) => removeValue.some((removeItem) => removeItem === value);
+
   if (IsArray(data)) {
-    const filtered = data.map((item) => ArrayObjectFilter(item, removeValue));
+    const filtered = data
+      .filter((item) => !shouldRemove(item))
+      .map((item) => ArrayObjectFilter(item, removeValue));
     return filtered as T;
   }
 
   if (IsObject(data)) {
     const result: Record<string, unknown> = {};
     Object.entries(data).forEach(([key, value]) => {
-      const shouldRemove = removeValue.some((removeItem) => removeItem === value);
-      if (shouldRemove) return;
+      if (shouldRemove(value)) return;
       result[key] = IsArray(value) || IsObject(value) ? ArrayObjectFilter(value, removeValue) : value;
     });
     return result as T;
@@ -169,21 +176,41 @@ const _SplitFormKey = (key: string): (string | number)[] => {
     .map((part) => (/^\d+$/.test(part) ? Number(part) : part));
 };
 
-/** 取得或建立下一層容器 */
+/** 將 array 轉為物件以保留既有索引資料 */
+const _ArrayToObject = (arr: any[]): Record<string, any> => {
+  const obj: Record<string, any> = {};
+  arr.forEach((value, index) => {
+    if (value !== undefined) obj[String(index)] = value;
+  });
+  return obj;
+};
+
+/** 取得或建立下一層容器，處理 array / object 型別衝突 */
 const _EnsureNestedContainer = (container: any, key: string | number, nextKey?: string | number) => {
+  const wantArray = typeof nextKey === 'number';
+
   if (Array.isArray(container)) {
     const index = Number(key);
     if (!Number.isFinite(index)) return undefined;
     if (container[index] === undefined) {
-      container[index] = typeof nextKey === 'number' ? [] : {};
+      container[index] = wantArray ? [] : {};
     }
     return container[index];
   }
 
-  if (container[key] === undefined) {
-    container[key] = typeof nextKey === 'number' ? [] : {};
+  const existing = container[key];
+  if (existing === undefined) {
+    container[key] = wantArray ? [] : {};
+    return container[key];
   }
-  return container[key];
+
+  // 型別衝突：既有為 array 但此次需要 object，轉成 object 保留資料
+  if (!wantArray && Array.isArray(existing)) {
+    container[key] = _ArrayToObject(existing);
+    return container[key];
+  }
+
+  return existing;
 };
 
 /** 依路徑設定值 */
@@ -246,13 +273,16 @@ const ScrollToEl = (
 ) => {
   if (!_IsClient() || !targetEl) return;
   const behavior: ScrollBehavior = isSmooth ? 'smooth' : 'auto';
-  const top = targetEl.offsetTop ?? 0;
+  const targetRect = targetEl.getBoundingClientRect();
 
   if (scrollEl instanceof Window) {
+    const top = targetRect.top + scrollEl.scrollY;
     scrollEl.scrollTo({ top, left: 0, behavior });
     return;
   }
 
+  const containerRect = scrollEl.getBoundingClientRect();
+  const top = targetRect.top - containerRect.top + scrollEl.scrollTop;
   scrollEl.scrollTo({ top, left: 0, behavior });
 };
 
@@ -280,7 +310,7 @@ const CopyText = async (text = ''): Promise<boolean> => {
 
   const textarea = document.createElement('textarea');
   textarea.value = text;
-  textarea.setAttribute('readonly', 'true');
+  textarea.setAttribute('readonly', '');
   textarea.style.position = 'absolute';
   textarea.style.left = '-9999px';
 
