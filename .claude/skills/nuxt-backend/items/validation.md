@@ -1,5 +1,9 @@
 # Zod Schema 驗證
 
+> [!NOTE]
+> **樣板規範**：本文件描述「啟用後端時」適用的統一規範。
+> 目前專案為前端快速樣板，`server/` 尚未建立，Zod 套件亦未安裝於 `package.json`。請於後端初始化後再一併加入 Zod 與 `@@/utils/validation` 工具。
+
 ## 基本用法
 
 ```typescript

@@ -48,10 +48,13 @@ description: |
 
 | 組件 | 說明 |
 |------|------|
-| `LyFilterSearchKey` | 搜尋關鍵字輸入 |
-| `LyFilterCompany` | 公司下拉選擇 |
-| `LyFilterDateRange` | 日期範圍選擇 |
-| `LyCtrlBtns` | 操作按鈕容器 |
+| `ElDialogPlus` | `ElDialog` + `$open` 整合 |
+| `ElDrawerPlus` | `ElDrawer` + `$open` 整合 |
+| `ElImagePlus` | 圖片顯示，含 loading / 佔位 |
+| `ElPaginationPlus` | 預設分頁器 |
+| `ElPopoverPlus` | 彈出層 + `$open` 整合 |
+
+> 完整清單見 [references/global-components.md](references/global-components.md)。
 
 ## 相關技能
 - [nuxt-frontend](../nuxt-frontend/SKILL.md) - 前端開發規範

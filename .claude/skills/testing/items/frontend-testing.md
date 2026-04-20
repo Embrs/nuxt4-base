@@ -1,54 +1,63 @@
 # 前端 UI 測試
 
-## Chrome DevTools MCP 測試流程
+## Playwright MCP 測試流程
 
 ### 基本流程
 
 ```
 1. 開啟頁面
-2. 取得快照
-3. 執行操作（點擊、輸入）
-4. 驗證結果
-5. 重複直到測試完成
+2. 取得快照（Accessibility Tree + ref）
+3. 執行操作（點擊、輸入、選擇）
+4. 等待 / 重新取得快照
+5. 驗證結果
 ```
 
 ### 常用工具
 
-| 工具 | 用途 |
+| 簡稱 | 用途 |
 |------|------|
-| `open_browser_url` | 開啟指定 URL |
-| `get_page_snapshot` | 取得頁面快照與元素 UID |
-| `click_element` | 點擊元素 |
-| `fill_input_element` | 填寫輸入框 |
-| `select_option` | 選擇下拉選項 |
+| `browser_navigate` | 開啟 URL |
+| `browser_snapshot` | 取得頁面快照（含 `ref`） |
+| `browser_click` | 點擊元素 |
+| `browser_type` | 填寫輸入框 |
+| `browser_fill_form` | 批次填寫表單 |
+| `browser_select_option` | 選擇 `<select>` |
+| `browser_press_key` | 按鍵（Enter、Escape 等） |
+| `browser_wait_for` | 等待文字出現 / 消失 |
+| `browser_take_screenshot` | 擷圖驗證 |
 
-### 範例：登入測試
+工具完整名稱為 `mcp__plugin_playwright_playwright__browser_*`。
+
+### 範例：登入測試（若後端已啟用）
 
 ```
-1. open_browser_url: http://localhost:3000/sign-in
-2. get_page_snapshot: 確認登入表單
-3. fill_input_element: 填寫 email
-4. fill_input_element: 填寫 password
-5. click_element: 點擊登入按鈕
-6. get_page_snapshot: 確認跳轉到首頁
+1. browser_navigate(url: "http://localhost:3000/sign-in")
+2. browser_snapshot → 取得 Email / 密碼欄位 ref
+3. browser_type(ref: "e3", text: "<測試帳號>")
+4. browser_type(ref: "e5", text: "<測試密碼>")
+5. browser_click(ref: "e8")  // 登入按鈕
+6. browser_wait_for(text: "儀表板")
+7. browser_snapshot → 確認頁面已切換
 ```
 
-## UID 注意事項
+## ref 注意事項
 
 > [!WARNING]
-> Snapshot UID 會在 DOM 變更後失效！
+> `ref` 會在 DOM 變更後失效！
 
 ### 常見問題
-- 操作後 DOM 改變，UID 會變
-- 需要重新 `get_page_snapshot` 取得新 UID
-- 不要快取舊的 UID
+
+- 操作後頁面重新渲染，`ref` 不再有效
+- 路由切換、資料重新載入都會讓 `ref` 變動
 
 ### 正確做法
+
 ```
-1. get_page_snapshot → 取得元素 UID
-2. click_element(uid) → 執行操作
-3. get_page_snapshot → 重新取得快照（DOM 可能已變）
-4. 使用新的 UID 繼續操作
+1. browser_snapshot → 取得元素 ref
+2. browser_click(ref)   → 執行操作
+3. browser_wait_for(...) → 等待預期狀態
+4. browser_snapshot → 重新取得快照
+5. 使用新 ref 繼續後續操作
 ```
 
 ## 測試案例模板
@@ -69,6 +78,7 @@
 - [ ] 頁面正常載入
 - [ ] 資料正確顯示
 - [ ] 表單驗證正常
-- [ ] 操作回饋正確
+- [ ] 操作回饋正確（loading、訊息）
 - [ ] 錯誤處理妥當
 - [ ] 權限控制正確
+- [ ] `browser_console_messages` 無未預期錯誤

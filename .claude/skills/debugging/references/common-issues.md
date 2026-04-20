@@ -1,5 +1,8 @@
 # 常見問題解決方案
 
+> [!NOTE]
+> **部分內容為樣板規範**：「後端問題」「部署問題」章節中涉及 Prisma / DATABASE_URL / JWT 的段落，需等 `server/` 與 `prisma/` 建立後才適用。
+
 ## 前端問題
 
 ### ElTable 資料不顯示

@@ -1,12 +1,16 @@
 ---
 name: nuxt-backend
 description: |
-  Nuxt Server Routes 後端開發技能。包含 API 響應格式、
+  Nuxt Server Routes 後端開發技能（樣板規範）。包含 API 響應格式、
   錯誤處理（return 非 throw）、Zod 驗證、JWT 認證。
-  開發 /nuxt-api/* 端點時使用此技能。
+  開發 /nuxt-api/* 端點時使用；本專案目前為前端樣板，server/ 尚未建立。
 ---
 
 # Nuxt Backend 技能
+
+> [!NOTE]
+> **樣板規範**：本 skill 描述「啟用後端時」適用的統一規範。
+> 目前專案為前端快速樣板，`server/` 目錄尚未建立，`@@/utils/response`、`@@/utils/prisma`、`@@/utils/validation` 等工具均為規劃中的 API。請於後端初始化後再實際套用。
 
 > Nuxt Server Routes 開發規範
 

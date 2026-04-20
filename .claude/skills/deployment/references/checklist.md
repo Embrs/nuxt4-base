@@ -1,5 +1,8 @@
 # 部署前檢查清單
 
+> [!NOTE]
+> 「資料庫檢查」「環境變數：DATABASE_URL / JWT_SECRET」「Dockerfile：prisma generate」等項目屬於樣板規範，待啟用後端 / 資料庫後才需檢查。
+
 ## 代碼檢查
 
 - [ ] 所有變更已提交

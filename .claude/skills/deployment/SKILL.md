@@ -29,25 +29,21 @@ description: |
 
 ## 關鍵配置
 
-### Dockerfile
+### Dockerfile（現行簡化示意，Node 24.11）
 ```dockerfile
-# 建構階段
-FROM node:20-alpine AS builder
+FROM node:24.11-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
 COPY . .
-RUN npx prisma generate
+RUN npm i
 RUN npm run build
 
-# 運行階段
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=builder /app/.output ./.output
-COPY --from=builder /app/node_modules ./node_modules
+FROM node:24.11-alpine AS runner
+COPY --from=builder /app/.output .output
 EXPOSE 3000
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", "/.output/server/index.mjs"]
 ```
+
+> `npx prisma generate` 僅在啟用 Prisma 後才需補回 Stage 1。詳見 [items/dockerfile.md](items/dockerfile.md)。
 
 ### Railway.toml
 ```toml

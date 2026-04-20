@@ -50,9 +50,9 @@ description: |
 | `$enum` | 枚舉常數 |
 
 ### 空值處理
-> 詳見 [prisma-database](../prisma-database/SKILL.md)
+> 詳見 [prisma-database/items/null-handling.md](../prisma-database/items/null-handling.md)（前後端共享標準）
 
 ## 相關技能
 - [element-plus-ui](../element-plus-ui/SKILL.md) - 使用 ElementPlus 組件時
-- [nuxt-backend](../nuxt-backend/SKILL.md) - 開發 API 端點時
-- [prisma-database](../prisma-database/SKILL.md) - 空值處理完整規範
+- [nuxt-backend](../nuxt-backend/SKILL.md) - 開發 API 端點時（樣板規範）
+- [prisma-database](../prisma-database/SKILL.md) - 空值處理完整規範（樣板規範）

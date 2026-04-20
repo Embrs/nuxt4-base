@@ -1,12 +1,25 @@
 # 環境變數配置
 
-## .env 結構
+> [!NOTE]
+> 本檔包含部分「樣板規範」（啟用後端 / 資料庫時才需要的變數）。
+> 目前專案為前端快速樣板，實際用到的 `.env` / `.env.dev` 僅含前端執行所需變數。後端變數（`DATABASE_URL`、`JWT_SECRET` 等）待後端初始化後再加入。
+
+## 現況：.env.dev 最小結構
 
 ```env
-# 資料庫
+# 應用
+NUXT_HOST=0.0.0.0
+NUXT_PORT=3000
+NODE_ENV=development
+```
+
+## 樣板規範：啟用後端後的 .env 結構
+
+```env
+# 資料庫（啟用後端後）
 DATABASE_URL="postgresql://user:password@host:5432/dbname"
 
-# JWT
+# JWT（啟用後端後）
 JWT_SECRET="your-secret-key"
 JWT_EXPIRES_IN="7d"
 

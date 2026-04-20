@@ -1,11 +1,15 @@
 ---
 name: prisma-database
 description: |
-  Prisma ORM 資料庫操作技能。包含查詢模式、事務處理、
-  空值處理標準（重要）、軟刪除。操作資料庫時使用此技能。
+  Prisma ORM 資料庫操作技能（樣板規範）。包含查詢模式、事務處理、
+  空值處理標準（重要）、軟刪除。操作資料庫時使用；本專案尚未安裝 Prisma。
 ---
 
 # Prisma Database 技能
+
+> [!NOTE]
+> **樣板規範**：本 skill 描述「啟用資料庫時」適用的統一規範。
+> 目前專案為前端快速樣板，`prisma/` 目錄尚未建立，Prisma 套件亦未列於 `package.json`。請於資料庫初始化後再實際套用。`items/null-handling.md` 的空值處理標準為前端亦共享的規範，僅待資料庫建立後才會在伺服器端真正運作。
 
 > Prisma ORM 資料庫操作規範
 

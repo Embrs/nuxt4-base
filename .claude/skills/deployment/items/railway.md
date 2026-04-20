@@ -40,7 +40,10 @@ healthcheckTimeout = 30
 
 ## 資料庫設定
 
-### 使用 Railway PostgreSQL
+> [!NOTE]
+> **樣板規範**：本段在 `server/` 與 `prisma/` 建立之後才需套用。目前樣板為純前端，無需設定資料庫。
+
+### 使用 Railway PostgreSQL（啟用後端後）
 1. Add Service → Database → PostgreSQL
 2. 複製 `DATABASE_URL` 到環境變數
 3. 執行遷移：`npx prisma migrate deploy`
@@ -73,5 +76,5 @@ DATABASE_URL="postgresql://..." npx prisma migrate deploy
 ## 相關文檔
 
 詳細部署指南：
-- `.windsurf/skills/deployment/items/dockerfile.md`
-- `.windsurf/skills/deployment/items/env-config.md`
+- [.claude/skills/deployment/items/dockerfile.md](dockerfile.md)
+- [.claude/skills/deployment/items/env-config.md](env-config.md)

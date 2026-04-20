@@ -1,5 +1,9 @@
 # 後端 API 調試
 
+> [!NOTE]
+> **樣板規範**：本文件描述「啟用後端 / 資料庫時」適用的統一調試規範。
+> 目前專案為前端快速樣板，`server/` 與 `prisma/` 尚未建立，請於初始化後端後再實際套用。
+
 ## 常見問題
 
 ### 1. API 404 Not Found
@@ -66,7 +70,7 @@ try {
   const user = await prisma.user.create({ data });
 } catch (error) {
   console.error('Prisma error:', error.code, error.message);
-  throw error;
+  return error;
 }
 ```
 
