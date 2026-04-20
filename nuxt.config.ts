@@ -78,6 +78,7 @@ export default defineNuxtConfig({
   css: [
     '@/assets/styles/css-class/index.css',
     '@/assets/styles/css-class/g-style.scss', // 全局通用
+    '@/assets/styles/css-class/rich-content.scss', // 富文本內容渲染
   ],
 
   // == Modules ===============================================================================================

@@ -72,3 +72,27 @@ if (res.status.code !== $enum.apiStatus.success) return false;
 ```
 
 Token 注入、錯誤處理、401 自動跳轉登入皆內建於 `app/protocol/fetch-api/`。
+
+## TinyEditor 富文本編輯器
+
+全局組件 `TinyEditor` 基於 TinyMCE 8 self-hosted（GPLv2）＋ `@tinymce/tinymce-vue` wrapper。
+
+**基本用法**：
+```vue
+<TinyEditor v-model="content" />
+```
+
+**Props**：
+| Prop | 型別 | 說明 |
+|------|------|------|
+| `modelValue` | `string` | HTML 字串（v-model） |
+| `initOverrides` | `Record<string, any>` | 覆寫 TinyMCE init 配置 |
+| `disabled` | `boolean` | 進入唯讀狀態 |
+
+**客製工具列／plugins**：修改 `app/utils/tinymce-config.ts`（tinymceToolbar、tinymcePlugins、tinymceDefaultInit），組件端無感。使用單一頁覆寫則傳 `initOverrides`。
+
+**圖片上傳**：內建 `images_upload_handler` 呼叫 `$api.ApiTinymceUpload`（POST `/nuxt-api/tinymce/upload`，回傳 `{ data: { url }, status }`）。骨架 API 目前僅回傳 placeholder URL。
+
+**SSR 安全**：組件內部以 `<ClientOnly>` 包裹，伺服器端渲染時顯示 loading placeholder，不存取 `window`/`document`。
+
+**靜態資源**：`npm install` 時 postinstall 會自動把 `node_modules/tinymce/` 複製到 `public/tinymce/`（已 gitignore）。升級 TinyMCE 僅需 `npm update tinymce`。

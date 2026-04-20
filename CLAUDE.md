@@ -170,7 +170,7 @@ if (res.status.code !== $enum.apiStatus.success) return false;
 
 | 文件 | 內容 | 建議閱讀時機 |
 |------|------|-------------|
-| [frontend-conventions.md](.claude/knowledge/frontend-conventions.md) | SFC 結構、命名慣例、SCSS BEM、Element Plus 限制、自動導入、彈窗系統 | 撰寫或修改 Vue 組件、頁面、SCSS 樣式時 |
+| [frontend-conventions.md](.claude/knowledge/frontend-conventions.md) | SFC 結構、命名慣例、SCSS BEM、Element Plus 限制、自動導入、彈窗系統、TinyEditor 富文本編輯器 | 撰寫或修改 Vue 組件、頁面、SCSS 樣式時 |
 | [backend-conventions.md](.claude/knowledge/backend-conventions.md) | API 路由結構、錯誤處理（`return` 非 `throw`）、統一響應格式、三語言錯誤訊息 | 撰寫 `server/routes/nuxt-api/*` 端點時 |
 
-> 最後更新時間：2026-04-09
+> 最後更新時間：2026-04-20
