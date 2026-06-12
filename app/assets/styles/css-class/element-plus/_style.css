@@ -8,7 +8,11 @@
   }
 }
 
-.el-picker-panel__content {
+/* 僅作用於「單一」日期選擇器面板；range 選擇器的兩個月份面板
+   （.el-date-range-picker__content）須保留 Element Plus 原生的
+   display:table-cell + width:50% 並排佈局，故以 :not() 排除，
+   避免被 width:100% 擠壓導致右側月份標題換行、與星期列重疊跑版。 */
+.el-picker-panel__content:not(.el-date-range-picker__content) {
   width: 100% !important;
   margin: unset !important;
   padding: 10px;
