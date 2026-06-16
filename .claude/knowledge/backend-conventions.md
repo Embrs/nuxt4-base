@@ -1,5 +1,8 @@
 # 後端編碼規範（Server API）
 
+> ⚠️ 本專案目前為純前端樣板，`server/` 尚未建立任何端點（`server/routes` 為空）。
+> 以下為**啟用後端時**的規範參考。
+
 Nitro server routes 位於 `server/routes/nuxt-api/`，使用 `@@` 別名引用 `server/`。
 
 ## API 路由結構

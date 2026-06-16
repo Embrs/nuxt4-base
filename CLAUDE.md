@@ -30,10 +30,10 @@ npm run lint:fix     # ESLint 自動修復
 ### 目錄結構
 
 - `app/` — 應用程式核心（pages、components、composables、stores、utils、plugins、protocol）
-- `server/` — Nitro 伺服器端（API 路由使用 `@@` 別名）
+- `server/` — Nitro 伺服器端（`@@` 別名）；**目前為純前端樣板，`server/routes` 尚未建立端點**
+- `shared/` — 前後端共享程式碼（`~shared` 別名，已含 `types/api.ts` 範例）
 - `i18n/locales/` — 多語系翻譯檔（zh、en、ja）
 - `types/` — 全局 TypeScript 型別定義
-- `shared/` — 前後端共享程式碼（以 `~shared` 別名引用）
 - `openspec/` — OpenSpec 規格系統，新增功能或重構時透過 openspec skill 建立變更提案
 
 ### 路徑別名
@@ -112,6 +112,8 @@ npm run lint:fix     # ESLint 自動修復
 
 ## 後端編碼規範（Server API）
 
+> ⚠️ 目前為純前端樣板，`server/routes` 尚未建立端點。以下為**啟用後端時**的規範參考（亦見 `nuxt-backend` skill）。
+
 ### API 路由結構
 
 ```
@@ -148,7 +150,9 @@ Store 檔案以數字前綴排序初始化順序，直接以函式形式使用�
 ## 彈窗系統
 
 使用 `$open` 全局工具開啟業務彈窗，組件位於 `app/components/open/`：
-- 命名規則：`OpenDialog{業務名稱}{模式}.vue`（Info/Edit/Create）
+- 命名規則：`Open{Drawer|Dialog}{業務名稱}{模式}.vue`（Info/Edit/Create）
+- 新增彈窗需在 `open/index.ts`（方法）與 `open/_index.d.ts`（型別聯集）註冊
+- 範本：`open/drawer/example/`（`OpenDrawerExampleInfo`）可作為新彈窗的起點
 - 確認對話框使用 `UseAsk()` composable
 
 ## API 請求
@@ -156,7 +160,7 @@ Store 檔案以數字前綴排序初始化順序，直接以函式形式使用�
 API 定義在 `app/protocol/fetch-api/api/` 下，按業務模組分目錄。已內建 Token 注入、錯誤處理、401 自動跳轉登入。
 
 ```typescript
-const res = await $api.GetUserList({ page: 1 });
+const res = await $api.SignIn({ account, password });
 if (res.status.code !== $enum.apiStatus.success) return false;
 ```
 
@@ -172,5 +176,6 @@ if (res.status.code !== $enum.apiStatus.success) return false;
 |------|------|-------------|
 | [frontend-conventions.md](.claude/knowledge/frontend-conventions.md) | SFC 結構、命名慣例、SCSS BEM、Element Plus 限制、自動導入、彈窗系統 | 撰寫或修改 Vue 組件、頁面、SCSS 樣式時 |
 | [backend-conventions.md](.claude/knowledge/backend-conventions.md) | API 路由結構、錯誤處理（`return` 非 `throw`）、統一響應格式、三語言錯誤訊息 | 撰寫 `server/routes/nuxt-api/*` 端點時 |
+| [.claude/skills/README.md](.claude/skills/README.md) | skill 分級（active/pending）與啟用後端 / 資料庫時的清理清單 | 評估或啟用樣板 skill、新增後端時 |
 
 > 最後更新時間：2026-06-16

@@ -67,8 +67,10 @@ Nuxt 4 + Vue 3 Composition API + TypeScript + Element Plus 的 SFC 撰寫規範�
 ## API 請求範式
 
 ```typescript
-const res = await $api.GetUserList({ page: 1 });
+const res = await $api.SignIn({ account, password });
 if (res.status.code !== $enum.apiStatus.success) return false;
 ```
+
+> 範例方法以實際存在於 `app/protocol/fetch-api/api/` 的方法為準（如 `SignIn`、`SignUp`）。
 
 Token 注入、錯誤處理、401 自動跳轉登入皆內建於 `app/protocol/fetch-api/`。

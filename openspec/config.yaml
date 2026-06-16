@@ -2,12 +2,11 @@ schema: spec-driven
 
 # Project context (optional)
 # This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  企業級 Nuxt 4 前端基底樣板。
+  技術棧：Nuxt 4 / Vue 3 Composition API / TypeScript / Element Plus / Pinia / Pug / SCSS。
+  規範：繁體中文註解；命名 Click*/*Flow/Api*；SCSS BEM 展平；後端錯誤以 return 回傳。
+  詳見 CLAUDE.md 與 .claude/knowledge/。使用 Conventional Commits（繁中描述）。
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
