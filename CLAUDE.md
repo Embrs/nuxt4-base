@@ -149,11 +149,14 @@ Store 檔案以數字前綴排序初始化順序，直接以函式形式使用�
 
 ## 彈窗系統
 
-使用 `$open` 全局工具開啟業務彈窗，組件位於 `app/components/open/`：
-- 命名規則：`Open{Drawer|Dialog}{業務名稱}{模式}.vue`（Info/Edit/Create）
+使用 `$open` 全局工具開啟業務彈窗（Drawer / Dialog / Modal 三型態，共用 `StoreOpen`），組件位於 `app/components/open/`：
+- 命名規則：`Open{Drawer|Dialog|Modal}{業務名稱}{模式}.vue`（Info/Edit/Create），慣例 `index.vue` + `form.vue` 兩層
+- 基底元件：`ElDrawerPlus`（側邊）、`ElDialogPlus`（置中）、`ElModalPlus`（自訂遮罩）
 - 新增彈窗需在 `open/index.ts`（方法）與 `open/_index.d.ts`（型別聯集）註冊
-- 範本：`open/drawer/example/`（`OpenDrawerExampleInfo`）可作為新彈窗的起點
+- 範本：`open/drawer/example/`、`open/dialog/example/`、`open/modal/example/` 可作為新彈窗的起點
+- 呼叫端 `await` 取結果：`const res = await $open.DialogExampleEdit(id); if (!res) return;`
 - 確認對話框使用 `UseAsk()` composable
+- 機制原理詳見 [.claude/knowledge/dialog-and-auto-refresh.md](.claude/knowledge/dialog-and-auto-refresh.md)
 
 ## API 請求
 
@@ -176,6 +179,7 @@ if (res.status.code !== $enum.apiStatus.success) return false;
 |------|------|-------------|
 | [frontend-conventions.md](.claude/knowledge/frontend-conventions.md) | SFC 結構、命名慣例、SCSS BEM、Element Plus 限制、自動導入、彈窗系統 | 撰寫或修改 Vue 組件、頁面、SCSS 樣式時 |
 | [backend-conventions.md](.claude/knowledge/backend-conventions.md) | API 路由結構、錯誤處理（`return` 非 `throw`）、統一響應格式、三語言錯誤訊息 | 撰寫 `server/routes/nuxt-api/*` 端點時 |
+| [dialog-and-auto-refresh.md](.claude/knowledge/dialog-and-auto-refresh.md) | 彈窗系統（`$open`／`StoreOpen`／三型態 Plus 基底）與前端自動更新機制（`nuxt.config.ts` experimental） | 新增彈窗、調整自動更新行為時 |
 | [.claude/skills/README.md](.claude/skills/README.md) | skill 分級（active/pending）與啟用後端 / 資料庫時的清理清單 | 評估或啟用樣板 skill、新增後端時 |
 
 > 最後更新時間：2026-06-16

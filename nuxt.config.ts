@@ -31,6 +31,16 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   // 使用開發工具
   devtools: { enabled: false },
+
+  // 前端自動更新機制 -------------------------------------------------------------
+  // 部署新版後，已開啟頁面的使用者「下次切換路由」時自動載入新版 bundle，無需手動 F5。
+  // 完全由 Nuxt 4 原生提供，專案內不需自寫 plugin / hook，亦不應出現 reloadNuxtApp()。
+  // 詳見 .claude/knowledge/dialog-and-auto-refresh.md
+  experimental: {
+    appManifest: true, // 產生版本 manifest，以 buildId 標記版本（checkOutdatedBuildInterval 的前提）
+    checkOutdatedBuildInterval: 5 * 60 * 1000, // client 背景每 5 分鐘比對一次最新 buildId
+    emitRouteChunkError: 'automatic' // chunk 載入失敗時於下次導航自動整頁刷新復原
+  },
   // 路徑別名設定
   alias: {
     '@@': resolve(__dirname, './server'),
