@@ -29,7 +29,6 @@ logs
 *.crt
 *.pem
 
-# Local env files（.env 為本機機密；.env.dev / .env.example 納入版控）
+# Local env files（.env 為本機機密；僅 .env.example 範本納入版控）
 .env
-!.env.dev
 !.env.example

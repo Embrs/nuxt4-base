@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 常用指令
 
 ```bash
-npm run dev          # 開發伺服器（使用 .env.dev，端口 3000）
+npm run dev          # 開發伺服器（載入 .env，端口 3000）
 npm run build        # 生產構建
 npm run preview      # 本地預覽生產構建
 npm run lint         # ESLint 檢查
@@ -21,7 +21,7 @@ npm run lint:fix     # ESLint 自動修復
 
 - 環境需求：Node.js >= 24.13.0
 - 本專案**未配置測試框架**，無 `npm test`
-- `npm run dev` 會載入 `.env.dev`；新環境需先自行建立該檔
+- `npm run dev`／`build`／`preview` 皆讀 `.env`；新環境需先 `cp .env.example .env`（`.env` 已被 gitignore）
 
 ## 專案架構
 

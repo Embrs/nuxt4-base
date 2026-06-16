@@ -11,7 +11,7 @@
 
 ```bash
 npm install   # 安裝依賴
-npm run dev   # 開發伺服器（載入 .env.dev，port 3000）
+npm run dev   # 開發伺服器（載入 .env，port 3000）
 npm run build # 生產構建
 npm run preview
 npm run lint  # ESLint 檢查
@@ -24,11 +24,10 @@ npm run lint  # ESLint 檢查
 
 | 檔案 | 用途 | 版控 |
 |------|------|------|
-| `.env.example` | 變數清單範本（含說明） | ✅ 納入 |
-| `.env.dev` | 開發環境（`npm run dev` 載入） | ✅ 納入，**禁放機密** |
-| `.env` | 本機機密（build/preview 載入） | ❌ 忽略 |
+| `.env.example` | 變數清單範本（含說明），**禁放機密** | ✅ 納入 |
+| `.env` | 本機實際值（dev / build / preview 皆讀此檔） | ❌ 忽略 |
 
-新環境請先 `cp .env.example .env` 再填值。`.env` 與 `.env.dev` 皆**禁止填入真實密碼後提交**。
+新環境請先 `cp .env.example .env` 再填值。`.env.example` 為唯一版控的 env 檔，**禁止填入真實密碼後提交**。
 
 ## 目錄結構
 

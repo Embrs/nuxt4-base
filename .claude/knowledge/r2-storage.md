@@ -8,7 +8,7 @@
 > 已落地（實際檔案）：
 > - [server/utils/r2-storage.ts](../../server/utils/r2-storage.ts) — R2 核心工具（**需先 `npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner`**，未裝前 import 無法解析，但因無路由引用故不影響 dev / build）
 > - [app/utils/general-r2-upload.ts](../../app/utils/general-r2-upload.ts) — 前端直傳工具（純瀏覽器 API，無外部依賴）
-> - `.env.example` / `.env.dev` / `.env` 已含 R2 變數區塊（註解狀態）
+> - `.env.example` / `.env` 已含 R2 變數區塊（註解狀態）
 
 本文整理自其他專案收斂的 R2 實戰實作，抽象為跨專案可攜的標準做法。新落地順序：**§3 前置設定 → §4 核心工具 → §5 後端 API → §6 前端直傳**，並務必看完 §10 注意事項與 §11 落地 Checklist。
 
@@ -55,7 +55,7 @@ npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 
 ### 3.2 環境變數
 
-本專案已在 `.env.example`、`.env.dev`、`.env` 三檔加入以下區塊（註解狀態）。啟用時取消註解並填值：
+本專案已在 `.env.example` 與 `.env` 加入以下區塊（註解狀態）。啟用時取消註解並填值：
 
 ```env
 # === Cloudflare R2 ===
@@ -72,7 +72,7 @@ MAX_OTHER_SIZE_MB=1024
 ```
 
 - `endpoint` 由 `R2_ACCOUNT_ID` 自動組成 `https://<accountId>.r2.cloudflarestorage.com`，**不需另外設環境變數**。
-- 機密值（`R2_SECRET_ACCESS_KEY`）只放後端，**永遠不可**出現在前端 bundle 或 git。`.env.example` / `.env.dev` 為版控檔（見 `.gitignore` 的 `!.env.dev`、`!.env.example`），只可留鍵名、不留值；真實值只放本機 `.env`（已被忽略）。
+- 機密值（`R2_SECRET_ACCESS_KEY`）只放後端，**永遠不可**出現在前端 bundle 或 git。`.env.example` 為唯一版控的 env 檔（見 `.gitignore` 的 `!.env.example`），只可留鍵名、不留值；真實值只放本機 `.env`（已被忽略）。
 - 本工具刻意用 `process.env.*` 直讀（可攜、符合標準 R2 命名），未走 `nuxt.config.ts` 的 `runtimeConfig`。若要改走 runtimeConfig，需把鍵改為 `NUXT_R2_*` 命名並調整 `r2-storage.ts`。
 
 ### 3.3 建立 Bucket 與 API Token（Cloudflare Dashboard）
