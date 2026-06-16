@@ -1,5 +1,6 @@
 {
-  "name": "nuxt-app",
+  "name": "nuxt4-base",
+  "description": "企業級 Nuxt 4 前端基底樣板",
   "type": "module",
   "private": true,
   "scripts": {
@@ -8,8 +9,12 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "prepare": "husky",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
+  },
+  "lint-staged": {
+    "*.{js,mjs,ts,vue}": "eslint --fix"
   },
   "dependencies": {
     "nuxt": "^4.4.8",
@@ -34,6 +39,8 @@
     "dayjs": "^1.11.18",
     "element-plus": "^2.14.1",
     "eslint": "^10.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.1",
     "pinia": "^3.0.4",

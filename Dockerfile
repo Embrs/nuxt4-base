@@ -1,7 +1,7 @@
 # ===================================================================
 # Stage 1: Builder
 # ===================================================================
-FROM node:24.11-alpine AS builder
+FROM node:24.13-alpine AS builder
 WORKDIR /app
 COPY . .
 ENV NODE_OPTIONS="--max-old-space-size=8192"
@@ -15,9 +15,9 @@ RUN test -f .output/server/index.mjs
 # ===================================================================
 # Stage 2: Production Runner
 # ===================================================================
-FROM node:24.11-alpine AS runner
-COPY --from=builder /app/.output .output
-COPY --from=builder /app/version.ts version.ts
+FROM node:24.13-alpine AS runner
+WORKDIR /app
+COPY --from=builder /app/.output ./.output
 
 # 環境變數
 ENV NODE_ENV=production
@@ -27,4 +27,4 @@ ENV NUXT_PORT=3000
 EXPOSE 3000
 
 # 啟動應用
-CMD ["node", "/.output/server/index.mjs"]
+CMD ["node", ".output/server/index.mjs"]
