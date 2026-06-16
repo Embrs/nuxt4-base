@@ -36,10 +36,10 @@ const InitFlow = (): boolean => {
 
 /** 刪除流程 */
 const DeleteFlow = async (): Promise<boolean> => {
-  isLoading.value = true;
   try {
-    // 詢問刪除
+    // 詢問刪除（確認後才進入刪除中狀態，避免一點刪除抽屜就空轉）
     if (!await $ask.Delete()) return false;
+    isLoading.value = true;
     // 範例：刪除 API if (!await ApiDelete(props.id)) return false;
     // 刷新頁面
     $mitt.EmitReload();
@@ -56,8 +56,9 @@ const DeleteFlow = async (): Promise<boolean> => {
 
 // -- 函式 --------------------------------------------------------------------------------------------
 /** 開啟編輯（範例：示範從抽屜內再開另一個彈窗） */
-const OpenEditDrawer = () => {
-  // 範例：$open.DrawerExampleEdit(props.id);
+const OpenEditDrawer = async () => {
+  // 範例：開啟編輯 Dialog；送出成功會 EmitReload，本抽屜已註冊 OnReload(InitFlow) 自動刷新
+  await $open.DialogExampleEdit(props.id);
 };
 
 // -- Api ---------------------------------------------------------------------------------------------

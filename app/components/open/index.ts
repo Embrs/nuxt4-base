@@ -53,7 +53,5 @@ export default {
   /** 範例：開啟資訊抽屜（Drawer 範本） */
   DrawerExampleInfo: (id: number = 0) => Open('OpenDrawerExampleInfo', { id }),
   /** 範例：開啟編輯彈窗（Dialog 範本，await 可取得回傳結果） */
-  DialogExampleEdit: (id: number = 0) => Open<{ id: number; name: string } | false>('OpenDialogExampleEdit', { id }),
-  /** 範例：開啟自訂彈層（Modal 範本，與 drawer/dialog 共用 StoreOpen） */
-  ModalExampleInfo: (id: number = 0) => Open('OpenModalExampleInfo', { id })
+  DialogExampleEdit: (id: number = 0) => Open<{ id: number; name: string } | false>('OpenDialogExampleEdit', { id })
 };

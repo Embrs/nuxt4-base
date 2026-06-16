@@ -2,7 +2,7 @@
 
 本基底兩個跨業務、可直接套用的機制：
 
-1. **彈窗系統（`$open`）** — 以「Pinia Store + Promise」統一管理所有對話框（Drawer / Dialog / Modal），呼叫端 `await` 即可拿到結果。
+1. **彈窗系統（`$open`）** — 以「Pinia Store + Promise」統一管理所有對話框（Drawer / Dialog 兩型態，抽屜與彈窗皆以 `$open` 呼叫），呼叫端 `await` 即可拿到結果。
 2. **前端自動更新** — 部署新版後，已開啟頁面的使用者在「下次切換路由」時自動載入新版，無需手動 F5；完全由 Nuxt 4 原生提供。
 
 ---
@@ -35,19 +35,18 @@
 | 容器 | `app/components/open/group/index.vue`（`#OpenGroup`，已掛於 `app.vue`） |
 | 狀態 composable | `app/composables/app/use-open-com-option.ts`（`UseOpenComOption`：`visible` / `isChange` / `isSendLock`） |
 | 確認對話框 | `app/composables/app/use-ask.ts`（`UseAsk`：`Delete` / `Cancel` / `ChangeClose`…） |
-| 基底元件 | `app/components/el/drawer-plus.vue`、`dialog-plus.vue`、`modal-plus.vue` |
+| 基底元件 | `app/components/el/drawer-plus.vue`、`dialog-plus.vue` |
 
 > **關閉一律 `resolve(false)`**：`OnClose` 把關閉當「取消」。彈窗成功時已先 `resolve(result)`，Promise 只認第一次 resolve，故關閉時的 `resolve(false)` 自動失效。呼叫端因此能用 `if (!res) return;` 統一判斷取消。
 
-### 3. 三種型態
+### 3. 兩種型態
 
 | 型態 | 基底 | 視覺 | 範本 |
 |------|------|------|------|
 | Drawer 抽屜 | `ElDrawerPlus` | 側邊滑出 | `open/drawer/example/info/`（`OpenDrawerExampleInfo`） |
 | Dialog 對話框 | `ElDialogPlus` | 置中、可拖曳 | `open/dialog/example/edit/`（`OpenDialogExampleEdit`，示範回傳值） |
-| Modal 自訂彈層 | `ElModalPlus` | 自訂遮罩置中、無 ElDialog 外框 | `open/modal/example/info/`（`OpenModalExampleInfo`） |
 
-三者皆吃同一套 props 慣例：`v-model`（開關）、`title`、`type`（`edit` / `info`）、`isChange`（觸發關閉二次確認）、`width`（行動裝置自動滿版）、`#footer` slot 提供 `AskClose`。
+兩者皆吃同一套 props 慣例：`v-model`（開關）、`title`、`type`（`edit` / `info`）、`isChange`（觸發關閉二次確認）、`width`（行動裝置自動滿版）、`#footer` slot 提供 `AskClose`。
 
 ### 4. 標準寫法（index + form 兩層）
 
@@ -96,7 +95,7 @@ if (!res) return;          // 使用者取消 / 關閉
 console.log(res);          // { id, name }
 
 // 無回傳值（純資訊 / 建立類，內部自行刷新列表）
-await $open.ModalExampleInfo(10);
+await $open.DrawerExampleInfo(10);
 ```
 
 ### 6. 確認對話框（`UseAsk`）
@@ -110,7 +109,7 @@ if (!await $ask.Delete(row.name)) return;
 
 ### 7. 新增彈窗 Checklist
 
-1. 在 `open/{drawer|dialog|modal}/` 下建 `業務名/模式/index.vue` + `form.vue`，命名 `Open{Drawer|Dialog|Modal}{業務名稱}{模式}`。
+1. 在 `open/{drawer|dialog}/` 下建 `業務名/模式/index.vue` + `form.vue`，命名 `Open{Drawer|Dialog}{業務名稱}{模式}`。
 2. `index.vue` 用對應 `*Plus` 基底 + `UseOpenComOption`；`form.vue` 成功時 `props.resolve(result)` + `emit('on-close')`。
 3. `_index.d.ts` 的 `OpenComponent` 聯集補組件名。
 4. `index.ts` 補開啟方法：`OpenXxx: (p) => Open<回傳型別 | false>('OpenXxx', p)`。

@@ -1,12 +1,11 @@
 # 彈窗型組件（open）
 
-以 `$open` 全局工具開啟的業務彈窗，由 `StoreOpen` 統一管理生命週期。三種型態共用同一套「Pinia Store + Promise」機制，呼叫端 `await` 即可拿到結果：
+以 `$open` 全局工具開啟的業務彈窗（抽屜、彈窗皆以 `$open` 呼叫），由 `StoreOpen` 統一管理生命週期。兩種型態共用同一套「Pinia Store + Promise」機制，呼叫端 `await` 即可拿到結果：
 
 | 型態 | 基底元件 | 視覺 | 範本 |
 |------|---------|------|------|
 | **Drawer** 抽屜 | `ElDrawerPlus` | 側邊滑出 | `drawer/example/info/`（`OpenDrawerExampleInfo`） |
 | **Dialog** 對話框 | `ElDialogPlus` | 置中、含拖曳 | `dialog/example/edit/`（`OpenDialogExampleEdit`） |
-| **Modal** 自訂彈層 | `ElModalPlus` | 自訂遮罩置中、無 ElDialog 外框 | `modal/example/info/`（`OpenModalExampleInfo`） |
 
 > 機制原理與「前端自動更新」一併整理於 [.claude/knowledge/dialog-and-auto-refresh.md](../../../.claude/knowledge/dialog-and-auto-refresh.md)。
 
@@ -17,11 +16,11 @@
 | `index.ts` | `$open` 的開啟/關閉方法（`Open`、`Close`、`CloseAll`、`CloseName`） | 新增彈窗時補方法 |
 | `_index.d.ts` | `OpenComponent`（組件名聯集）與 `OpenParams` 型別 | 新增彈窗時補型別 |
 | `group/index.vue` | 彈窗渲染器（不用動） | 否 |
-| `drawer/` `dialog/` `modal/` | 三種型態的業務彈窗，依型態分目錄 | 在對應目錄下新增 |
+| `drawer/` `dialog/` | 兩種型態的業務彈窗，依型態分目錄 | 在對應目錄下新增 |
 
 ## 新增一個彈窗
 
-1. 在 `drawer/`、`dialog/` 或 `modal/` 下建立組件，命名 `Open{Drawer|Dialog|Modal}{業務名稱}{模式}.vue`（Info / Edit / Create）。
+1. 在 `drawer/` 或 `dialog/` 下建立組件，命名 `Open{Drawer|Dialog}{業務名稱}{模式}.vue`（Info / Edit / Create）。
    - 組件名由路徑自動推導（如 `open/dialog/user/edit/index.vue` → `OpenDialogUserEdit`）。
    - 慣例採 `index.vue`（佈局＋按鈕）＋ `form.vue`（表單／業務流程）兩層。
 2. 在 `_index.d.ts` 的 `OpenComponent` 聯集補上組件名。

@@ -3,7 +3,6 @@
 type OpenComponent =
   | 'OpenDrawerExampleInfo'
   | 'OpenDialogExampleEdit'
-  | 'OpenModalExampleInfo'
 
 // 參數群 -----------------------------------------------------------------------------------------------
 // 對應各彈窗的 params 型別，依需求收斂（例：DrawerExampleInfoParams | DialogXxxParams）

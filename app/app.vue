@@ -38,6 +38,6 @@ ElConfigProvider(:locale="$elementI18n.elLocale.value")
   NuxtLayout
     NuxtPage
 
-  //- Drawer Modal Dialog 跳窗群組
+  //- Drawer Dialog 跳窗群組
   OpenGroup
 </template>
