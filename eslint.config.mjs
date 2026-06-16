@@ -2,6 +2,10 @@
 import withNuxt from './.nuxt/eslint.config.mjs';
 export default withNuxt([
   {
+    // 不檢查的目錄：IDE 設定（含 SFC 範本 demo.vue）、規格文件
+    ignores: ['.vscode/**', 'openspec/**']
+  },
+  {
     rules: {
       'dot-notation': 'off', // 不強制使用 "."
       'no-console': 'off', // 可以使用 console

@@ -1,43 +1,47 @@
 <script setup lang="ts">
-// Error 請填寫功能描述👈
+// Error 錯誤頁：顯示狀態碼與訊息，並提供返回首頁
+// -- 引入 --------------------------------------------------------------------------------------------
+const { t } = useI18n();
+
+// -- 資料 --------------------------------------------------------------------------------------------
 type Props = {
   error: { statusCode: number, statusMessage: string }
 }
 const props = defineProps<Props>();
-const HandleError = () => {
+
+// -- 接收事件 -----------------------------------------------------------------------------------------
+/** 點擊回首頁 */
+const ClickGoHome = () => {
   clearError({ redirect: '/' });
 };
 </script>
 
 <template lang="pug">
-#Error
-  p.title {{ props.error.statusCode }}
-  p.msg {{ props.error.statusMessage }}
-  p.go-home-btn(
-    @click="HandleError"
-  ) 回到首頁
+.Error
+  p.Error__code {{ props.error.statusCode }}
+  p.Error__msg {{ props.error.statusMessage }}
+  p.Error__home-btn(@click="ClickGoHome") {{ t('common.goHome') }}
 </template>
 
 <style lang="scss" scoped>
 // 佈局 ----
-#Error {
+.Error {
   @include wh(100vw, 100vh);
   @include center-col(10px);
   color: white;
   background-color: $primary;
-  // TODO
 }
 
 // 組件 ----
-.title {
+.Error__code {
   @include fs(100px);
   font-weight: 900;
 }
-.msg {
+.Error__msg {
   @include fs(30px);
   margin-bottom: 20px;
 }
-.go-home-btn {
+.Error__home-btn {
   @include fs(20px);
   @include center;
   cursor: pointer;

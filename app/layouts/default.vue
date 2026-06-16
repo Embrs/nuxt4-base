@@ -1,6 +1,5 @@
 <script setup lang="ts">
-// LayoutDefault 請填寫功能描述👈
-const storeEnv = StoreEnv();
+// LayoutDefault 預設佈局：無頁首頁尾，直接渲染頁面內容
 </script>
 
 <template lang="pug">
@@ -11,8 +10,6 @@ const storeEnv = StoreEnv();
 <style lang="scss" scoped>
 // 佈局 ----
 .LayoutDefault {
-  // TODO
+  min-height: 100vh;
 }
-
-// 組件 ----
 </style>

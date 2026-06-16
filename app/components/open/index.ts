@@ -50,11 +50,6 @@ export default {
   /** 關閉指定名稱 組件 */
   CloseName,
   // -----------------------------------------------------------------------------------------------
-  /** 開啟測試 抽屜 */
-  DrawerDemoInfo: () => Open('OpenDrawerDemoInfo'),
-  /** 影片錄製 */
-  DialogVideoRecording: () => Open<File>('OpenDialogVideoRecording'),
-  /** 圖片選擇 */
-  DialogImageEdit: () => Open<File>('OpenDialogImageSelect')
-  // TODO 組件加完後，要設定
+  /** 範例：開啟資訊抽屜（新增業務彈窗的範本） */
+  DrawerExampleInfo: (id: number = 0) => Open('OpenDrawerExampleInfo', { id })
 };

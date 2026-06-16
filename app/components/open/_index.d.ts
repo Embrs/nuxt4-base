@@ -1,11 +1,8 @@
 // 組件群 -----------------------------------------------------------------------------------------------
+// 新增業務彈窗時，在此聯集補上組件名（PascalCase，對應 components/open 下的檔案路徑）
 type OpenComponent =
-  'OpenDrawerDemoInfo'
-  | 'OpenDialogVideoRecording' // 影片錄製
-  | 'OpenDialogImageSelect' // 圖片選擇
-  // | 'OpenDialogDemo2'
-  // TODO 組件加完後，要設定
+  'OpenDrawerExampleInfo'
 
 // 參數群 -----------------------------------------------------------------------------------------------
-type OpenParams = any
-// TODO 組件加完後，要設定（例：DialogXxxParams | DialogYyyParams）
+// 對應各彈窗的 params 型別，依需求收斂（例：DrawerExampleInfoParams | DialogXxxParams）
+type OpenParams = Record<string, any>

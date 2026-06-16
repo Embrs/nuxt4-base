@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// OpenDrawerDemoInfoForm // TODO
+// OpenDrawerExampleInfoForm 範例資訊表單
 // -- 引入 --------------------------------------------------------------------------------------------
 const $mitt = UseMitt();
 const $ask = UseAsk();
@@ -24,8 +24,7 @@ const InitFlow = (): boolean => {
   isLoading.value = true;
   isReady.value = false;
   try {
-    // TODO
-    // if (!await Api()) return false;
+    // 範例：載入詳情 if (!await ApiGetInfo(props.id)) return false;
     isReady.value = true;
     return true;
   } catch (err) {
@@ -41,8 +40,7 @@ const DeleteFlow = async (): Promise<boolean> => {
   try {
     // 詢問刪除
     if (!await $ask.Delete()) return false;
-    // 刪除api
-    // if (!await Api()) return false;
+    // 範例：刪除 API if (!await ApiDelete(props.id)) return false;
     // 刷新頁面
     $mitt.EmitReload();
     ElMessage.success('刪除成功');
@@ -57,12 +55,9 @@ const DeleteFlow = async (): Promise<boolean> => {
 };
 
 // -- 函式 --------------------------------------------------------------------------------------------
-/** 開啟編輯 */
+/** 開啟編輯（範例：示範從抽屜內再開另一個彈窗） */
 const OpenEditDrawer = () => {
-  // const _params: OpenDrawerExEdit = {
-  //   id: 123
-  // };
-  // $open.OpenDrawerExEdit(_params);
+  // 範例：$open.DrawerExampleEdit(props.id);
 };
 
 // -- Api ---------------------------------------------------------------------------------------------
@@ -90,7 +85,7 @@ defineExpose({
 </script>
 
 <template lang="pug">
-.OpenDrawerDemoInfoForm(v-loading="isLoading")
+.OpenDrawerExampleInfoForm(v-loading="isLoading")
   ElForm(
     v-if="isReady"
     label-position="top"
@@ -104,7 +99,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 // 佈局 ----
-.OpenDrawerDemoInfoForm {
+.OpenDrawerExampleInfoForm {
   min-height: 300px;
 }
 
