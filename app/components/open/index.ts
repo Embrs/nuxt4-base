@@ -50,8 +50,6 @@ export default {
   /** 關閉指定名稱 組件 */
   CloseName,
   // -----------------------------------------------------------------------------------------------
-  /** 開啟測試 */
-  DialogDemo: (params: DialogDemoParams) => Open('OpenDialogDemo', params),
   /** 開啟測試 抽屜 */
   DrawerDemoInfo: () => Open('OpenDrawerDemoInfo'),
   /** 影片錄製 */
