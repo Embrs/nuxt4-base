@@ -1,11 +1,9 @@
 import * as file from './api/file';
 import * as auth from './api/auth';
-import * as tinymce from './api/tinymce';
 
 export default {
   ...file,
-  ...auth,
-  ...tinymce
+  ...auth
 };
 
 

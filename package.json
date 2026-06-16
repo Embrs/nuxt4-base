@@ -7,14 +7,12 @@
     "dev": "nuxt dev --dotenv .env.dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && node scripts/copy-tinymce.mjs",
+    "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@tinymce/tinymce-vue": "^6.3.0",
     "nuxt": "^4.4.6",
-    "tinymce": "^8.4.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   },
@@ -40,8 +38,7 @@
     "mitt": "^3.0.1",
     "pinia": "^3.0.4",
     "pug": "^3.0.3",
-    "sass": "^1.92.1",
-    "tinymce-i18n": "^26.4.6"
+    "sass": "^1.92.1"
   },
   "overrides": {
     "glob": "^11.0.4",
