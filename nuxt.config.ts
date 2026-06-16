@@ -1,5 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { visualizer } from 'rollup-plugin-visualizer'; // 打包分析
 import { resolve } from 'node:path';
 import version from './version'; // 版本號
 import dayjs from 'dayjs'; // 日期處理
@@ -9,16 +8,20 @@ const useVisualizer = false; // 使用打包分析
 // ------------------------
 // vite plugin 建置
 const VitePlugins = () => {
-  const arr = [];
+  const arr: any[] = [];
   if (useVisualizer) {
+    // 動態載入 rollup-plugin-visualizer，僅在需要時才引入，
+    // 避免此 optional 套件未安裝時於啟動階段直接報錯
     arr.push(
-      visualizer({ // 打包分析 https://juejin.cn/post/7159410085460983839
-        gzipSize: true,
-        brotliSize: true,
-        emitFile: false,
-        filename: 'test.html', // 析圖產生的檔案名
-        open: true // 如果存在本地服務端口，將在打包後自動展示
-      })
+      import('rollup-plugin-visualizer').then(({ visualizer }) =>
+        visualizer({ // 打包分析 https://juejin.cn/post/7159410085460983839
+          gzipSize: true,
+          brotliSize: true,
+          emitFile: false,
+          filename: 'test.html', // 析圖產生的檔案名
+          open: true // 如果存在本地服務端口，將在打包後自動展示
+        })
+      )
     );
   }
   return arr;

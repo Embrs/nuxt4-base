@@ -6,8 +6,6 @@
 .cache
 dist
 test.html
-.stylelintcache
-test.html
 
 # Node dependencies
 node_modules
@@ -24,8 +22,14 @@ logs
 .DS_Store
 .fleet
 .idea
-
 .stylelintcache
-# Local env files
+
+# 憑證 / 私鑰（請勿提交，請於本機自行產生）
+*.key
+*.crt
+*.pem
+
+# Local env files（.env 為本機機密；.env.dev / .env.example 納入版控）
 .env
 !.env.dev
+!.env.example
