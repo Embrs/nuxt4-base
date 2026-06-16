@@ -179,6 +179,7 @@ if (res.status.code !== $enum.apiStatus.success) return false;
 |------|------|-------------|
 | [frontend-conventions.md](.claude/knowledge/frontend-conventions.md) | SFC 結構、命名慣例、SCSS BEM、Element Plus 限制、自動導入、彈窗系統 | 撰寫或修改 Vue 組件、頁面、SCSS 樣式時 |
 | [backend-conventions.md](.claude/knowledge/backend-conventions.md) | API 路由結構、錯誤處理（`return` 非 `throw`）、統一響應格式、三語言錯誤訊息 | 撰寫 `server/routes/nuxt-api/*` 端點時 |
+| [r2-storage.md](.claude/knowledge/r2-storage.md) | Cloudflare R2 檔案儲存（預簽署直傳三步驟、`server/utils/r2-storage.ts` 核心工具、前端直傳、CORS／TTL／踩雷）。核心工具與前端工具已落地、後端端點為樣板規範 | 處理檔案上傳／下載、啟用 R2 時 |
 | [dialog-and-auto-refresh.md](.claude/knowledge/dialog-and-auto-refresh.md) | 彈窗系統（`$open`／`StoreOpen`／三型態 Plus 基底）與前端自動更新機制（`nuxt.config.ts` experimental） | 新增彈窗、調整自動更新行為時 |
 | [.claude/skills/README.md](.claude/skills/README.md) | skill 分級（active/pending）與啟用後端 / 資料庫時的清理清單 | 評估或啟用樣板 skill、新增後端時 |
 
