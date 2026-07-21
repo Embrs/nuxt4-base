@@ -70,6 +70,4 @@ pending 級 skill 的 `SKILL.md` frontmatter `description` 中亦應含「樣板
 
 ## 觸發測試
 
-修改 skill 後應以實際情境觸發確認能載入。上次完整觸發測試結果請見：
-- `openspec/changes/archive/*audit-project-skills/validation.md`（歸檔後）
-- `openspec/changes/audit-project-skills/validation.md`（進行中）
+修改 skill 後應以實際情境觸發確認能載入。
