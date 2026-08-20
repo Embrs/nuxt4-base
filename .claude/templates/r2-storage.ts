@@ -5,9 +5,14 @@
  * 設計為「可直接複製到任何 Nuxt / Node.js 專案」的可攜模組，僅依賴 @aws-sdk，
  * 不依賴本專案其他後端工具，方便日後啟用後端時直接套用。
  *
- * ⚠️ 啟用前置：本檔依賴尚未安裝的後端套件，請先執行：
- *     npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
- *   未安裝前此檔的 import 無法解析；由於目前無任何路由引用本檔，不影響 dev / build。
+ * ⚠️ 本檔目前是「範本」，不參與建置（放在 .claude/templates/ 而非 server/utils/）。
+ *   原因：它依賴尚未安裝的 @aws-sdk，放在 server/utils/ 會被 Nitro 自動掃描，
+ *   於 npm run dev 產生「could not be resolved」警告。
+ *
+ * 啟用步驟（要用 R2 時）：
+ *   1. npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+ *   2. 將本檔移回 server/utils/r2-storage.ts（即可用 @@/utils/r2-storage 引用）
+ *   3. 依 .claude/knowledge/r2-storage.md §11 Checklist 完成 env / bucket / CORS 設定
  *
  * 機制與端點用法詳見 .claude/knowledge/r2-storage.md
  */

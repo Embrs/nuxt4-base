@@ -1,14 +1,19 @@
 # Cloudflare R2 檔案儲存
 
 > [!NOTE]
-> **混合級別**：環境變數與下列兩支「實際檔案」已落地可用，**後端端點（§5）為樣板規範**。
+> **混合級別**：環境變數與前端直傳工具已落地可用，R2 核心工具為**待啟用範本**，**後端端點（§5）為樣板規範**。
 > 目前專案為前端快速樣板，`server/routes`、Prisma、JWT、`@@/utils/response` 尚未建立，
 > §5 的端點與 DB 模型請於初始化後端後再實際建立。
 >
 > 已落地（實際檔案）：
-> - [server/utils/r2-storage.ts](../../server/utils/r2-storage.ts) — R2 核心工具（**需先 `npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner`**，未裝前 import 無法解析，但因無路由引用故不影響 dev / build）
 > - [app/utils/general-r2-upload.ts](../../app/utils/general-r2-upload.ts) — 前端直傳工具（純瀏覽器 API，無外部依賴）
 > - `.env.example` / `.env` 已含 R2 變數區塊（註解狀態）
+>
+> 範本（**不參與建置**）：
+> - [.claude/templates/r2-storage.ts](../templates/r2-storage.ts) — R2 核心工具。因依賴未安裝的 `@aws-sdk`，
+>   放在 `server/utils/` 會被 Nitro 掃描並在 `npm run dev` 產生 `could not be resolved` 警告，
+>   故暫置於此。啟用時：`npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner`
+>   → 移回 `server/utils/r2-storage.ts` → 即可用 `@@/utils/r2-storage` 引用。
 
 本文整理自其他專案收斂的 R2 實戰實作，抽象為跨專案可攜的標準做法。新落地順序：**§3 前置設定 → §4 核心工具 → §5 後端 API → §6 前端直傳**，並務必看完 §10 注意事項與 §11 落地 Checklist。
 
@@ -52,6 +57,7 @@ npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 ```
 
 > 兩個版本通常一致（本系列驗證於 `^3.930.0`）。本專案目前**刻意尚未安裝**，啟用後端時再裝。
+> 也因此 `r2-storage.ts` 暫置於 `.claude/templates/`，安裝後需一併移回 `server/utils/`。
 
 ### 3.2 環境變數
 
@@ -103,9 +109,11 @@ Cloudflare Dashboard → 該 bucket → Settings → CORS Policy：
 
 ---
 
-## 4. 核心工具：[server/utils/r2-storage.ts](../../server/utils/r2-storage.ts)
+## 4. 核心工具：[.claude/templates/r2-storage.ts](../templates/r2-storage.ts)
 
-已建為實際檔案，可直接複製到任何專案。對外提供：
+已寫好完整實作、可直接複製到任何專案，但目前是**範本狀態**（不參與建置）。
+啟用時先裝 `@aws-sdk` 兩個套件，再把檔案移到 `server/utils/r2-storage.ts`，
+即可用 `@@/utils/r2-storage` 引用（下方 §5 端點範例皆以此路徑撰寫）。對外提供：
 
 | 函式 | 用途 |
 |------|------|
@@ -360,7 +368,7 @@ await downloadFromR2(backupKey, '/tmp/restore.dump');
 - [ ] 取消 `.env*` R2 區塊註解並填值（機密只放本機 `.env`）
 - [ ] Cloudflare 建 bucket + Object Read & Write 的 API Token
 - [ ] **bucket 設 CORS**（含所有前端來源，方法含 `PUT` `GET`）
-- [x] `server/utils/r2-storage.ts`（已建）
+- [ ] 將 `.claude/templates/r2-storage.ts` 移回 `server/utils/r2-storage.ts`（實作已完成，僅需搬移）
 - [ ] 建 `@@/utils/{jwt,response,prisma}` 後端基礎設施（啟用後端的前提）
 - [ ] 建 `presigned` / `confirm` 兩支後端 API（confirm 必含 `HeadObject` 檢查）
 - [ ] 建 `GET /files/:id` 存取端點（302 跳轉 signed URL）
@@ -376,4 +384,4 @@ await downloadFromR2(backupKey, '/tmp/restore.dump');
 可放一支 `scripts/test-r2-connection.ts`，部署前用 `npx tsx scripts/test-r2-connection.ts` 驗證：
 ①必要環境變數是否齊 ②Node / OpenSSL 版本 ③實際上傳一個小檔再刪除（驗證憑證、endpoint、CORS 與連線正確性）④失敗時印出具體錯誤與排查建議。
 
-> 來源：抽象自其他專案的 R2 實戰實作，適配本專案前端樣板狀態（後端為樣板規範）。最後更新：2026-06-16。
+> 來源：抽象自其他專案的 R2 實戰實作，適配本專案前端樣板狀態（後端為樣板規範）。最後更新：2026-08-20。

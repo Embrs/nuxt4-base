@@ -2,8 +2,8 @@
 import withNuxt from './.nuxt/eslint.config.mjs';
 export default withNuxt([
   {
-    // 不檢查的目錄：IDE 設定（含 SFC 範本 demo.vue）、規格文件
-    ignores: ['.vscode/**', 'openspec/**']
+    // 不檢查的目錄：IDE 設定（含 SFC 範本 demo.vue）、規格文件、不參與建置的程式碼範本
+    ignores: ['.vscode/**', 'openspec/**', '.claude/templates/**']
   },
   {
     rules: {
